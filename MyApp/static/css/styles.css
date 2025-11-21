@@ -1,2 +1,916 @@
 /* Minimal custom styles to prove static serving works */
-body { line-height: 1.6; }
+/* body { line-height: 1.6; } */
+.front {
+  display: flex;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  box-sizing: border-box;
+  background-color: var(--color-background-default-default);
+}
+
+.front .component {
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+  flex: 1;
+  flex-grow: 1;
+  align-items: center;
+  position: relative;
+}
+
+.front .hero-basic {
+  display: flex;
+  flex-direction: column;
+  height: 452px;
+  align-items: center;
+  padding: var(--size-space-4000) var(--size-space-1600) var(--size-space-4000)
+    var(--size-space-1600);
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  background-color: var(--color-background-default-secondary);
+}
+
+.front .text-content-title {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--size-space-200);
+  position: relative;
+  flex: 0 0 auto;
+  margin-bottom: -38.00px;
+}
+
+.front .title {
+  position: relative;
+  align-self: stretch;
+  margin-top: -1.00px;
+  font-family: var(--title-hero-font-family);
+  font-weight: var(--title-hero-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--title-hero-font-size);
+  text-align: center;
+  letter-spacing: var(--title-hero-letter-spacing);
+  line-height: var(--title-hero-line-height);
+  font-style: var(--title-hero-font-style);
+}
+
+.front .subtitle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  font-family: var(--subtitle-font-family);
+  font-weight: var(--subtitle-font-weight);
+  color: var(--color-text-default-secondary);
+  font-size: var(--subtitle-font-size);
+  text-align: center;
+  letter-spacing: var(--subtitle-letter-spacing);
+  line-height: var(--subtitle-line-height);
+  font-style: var(--subtitle-font-style);
+}
+
+.front .page-accordion {
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  height: 481px;
+  background-color: var(--color-background-default-default);
+}
+
+.front .text-content-heading {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--size-space-200);
+  position: absolute;
+  top: 2px;
+  left: 544px;
+}
+
+.front .text-wrapper {
+  text-align: center;
+  position: relative;
+  align-self: stretch;
+  margin-top: -1.00px;
+  font-family: var(--heading-font-family);
+  font-weight: var(--heading-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--heading-font-size);
+  letter-spacing: var(--heading-letter-spacing);
+  line-height: var(--heading-line-height);
+  font-style: var(--heading-font-style);
+}
+
+.front .div {
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  font-family: var(--subheading-font-family);
+  font-weight: var(--subheading-font-weight);
+  color: var(--color-text-default-secondary);
+  font-size: var(--subheading-font-size);
+  letter-spacing: var(--subheading-letter-spacing);
+  line-height: var(--subheading-line-height);
+  font-style: var(--subheading-font-style);
+}
+
+.front .accordion {
+  display: flex;
+  flex-direction: column;
+  max-width: 640px;
+  width: 640px;
+  align-items: flex-start;
+  gap: var(--size-space-400);
+  position: absolute;
+  top: 93px;
+  left: 280px;
+}
+
+.front .accordion-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--size-space-200);
+  padding: var(--size-padding-lg);
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+  background-color: var(--color-background-default-default);
+  border-radius: var(--size-radius-200);
+  border: 1px solid;
+  border-color: var(--color-border-default-default);
+}
+
+.front .accordion-title {
+  display: flex;
+  align-items: center;
+  gap: var(--size-space-200);
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.front .text-wrapper-2 {
+  position: relative;
+  flex: 1;
+  margin-top: -1.00px;
+  font-family: var(--body-strong-font-family);
+  font-weight: var(--body-strong-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--body-strong-font-size);
+  letter-spacing: var(--body-strong-letter-spacing);
+  line-height: var(--body-strong-line-height);
+  font-style: var(--body-strong-font-style);
+}
+
+.front .img {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.front .accordion-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.front .body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  margin-top: -1.00px;
+  font-family: var(--body-base-font-family);
+  font-weight: var(--body-base-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--body-base-font-size);
+  letter-spacing: var(--body-base-letter-spacing);
+  line-height: var(--body-base-line-height);
+  font-style: var(--body-base-font-style);
+}
+
+.front .accordion-title-wrapper {
+  display: flex;
+  align-items: center;
+  padding: var(--size-padding-lg);
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+  background-color: var(--color-background-default-secondary);
+  border-radius: var(--size-radius-200);
+  border: 1px solid;
+  border-color: var(--color-border-default-default);
+}
+
+.front .accordion-title-2 {
+  display: flex;
+  align-items: center;
+  gap: var(--size-space-200);
+  position: relative;
+  flex: 1;
+  flex-grow: 1;
+}
+
+.front .panel-image-content {
+  display: flex;
+  height: 479px;
+  align-items: center;
+  gap: var(--size-space-1200);
+  padding: var(--size-space-1600);
+  position: relative;
+  align-self: stretch;
+  width: var(--responsive-device-width);
+  background-color: var(--color-background-default-default);
+  opacity: 0.8;
+}
+
+.front .image {
+  position: relative;
+  flex: 1;
+  align-self: stretch;
+  flex-grow: 1;
+  background-image: url(https://c.animaapp.com/DnqGvymX/img/image-3.png);
+  background-size: cover;
+  background-position: 50% 50%;
+}
+
+.front .text-content-flow {
+  display: flex;
+  flex-direction: column;
+  width: 484px;
+  height: 351px;
+  align-items: flex-start;
+  gap: var(--size-space-600);
+  position: relative;
+}
+
+.front .text-content-heading-2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--size-space-200);
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.front .text-wrapper-3 {
+  position: relative;
+  align-self: stretch;
+  margin-top: -1.00px;
+  font-family: var(--heading-font-family);
+  font-weight: var(--heading-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--heading-font-size);
+  letter-spacing: var(--heading-letter-spacing);
+  line-height: var(--heading-line-height);
+  font-style: var(--heading-font-style);
+}
+
+.front .text-wrapper-4 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  font-family: var(--subheading-font-family);
+  font-weight: var(--subheading-font-weight);
+  color: var(--color-text-default-secondary);
+  font-size: var(--subheading-font-size);
+  letter-spacing: var(--subheading-letter-spacing);
+  line-height: var(--subheading-line-height);
+  font-style: var(--subheading-font-style);
+}
+
+.front .text {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.front .p {
+  position: relative;
+  flex: 1;
+  margin-top: -1.00px;
+  font-family: var(--body-base-font-family);
+  font-weight: var(--body-base-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--body-base-font-size);
+  letter-spacing: var(--body-base-letter-spacing);
+  line-height: var(--body-base-line-height);
+  font-style: var(--body-base-font-style);
+}
+
+.front .frame {
+  display: flex;
+  flex-direction: column;
+  width: 1042px;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.front .frame-2 {
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  height: 488px;
+}
+
+.front .upload-file {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 547px;
+  height: 488px;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.front .header {
+  margin-left: 145px;
+  width: 257px;
+  height: 64px;
+  margin-top: 0.4px;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 8px 8px 0px 0px;
+  border-top-style: none;
+  border-right-style: none;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-left-style: none;
+  border-color: #e3e3e3;
+}
+
+.front .title-2 {
+  margin-top: 20px;
+  width: 209px;
+  height: 24px;
+  margin-left: 24px;
+  font-family: "Inter", Helvetica;
+  font-weight: 600;
+  color: #000000;
+  font-size: 20px;
+  letter-spacing: 0;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.front .content {
+  height: 286px;
+  margin-top: 32.6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.front .component-upload {
+  display: inline-flex;
+  margin-left: 24px;
+  width: 461px;
+  height: 202px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  background-color: #ffffff;
+  position: relative;
+  border-radius: 5px;
+}
+
+.front .frame-3 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+  width: 100%;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.front .component-2 {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.front .frame-4 {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.front .please-upload-square {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Poppins", Helvetica;
+  font-weight: 300;
+  font-style: italic;
+  color: #000000;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+.front .component-upload-2 {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 10px;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+  background-color: #f7fbff;
+  position: relative;
+  border-radius: 5px;
+}
+
+.front .component-button {
+  display: inline-flex;
+  gap: 10px;
+  padding: 10px 20px;
+  flex: 0 0 auto;
+  margin-top: -1.00px;
+  margin-bottom: -1.00px;
+  margin-left: -1.00px;
+  border-radius: 5px;
+  border: 1px solid;
+  border-color: #10b981;
+  align-items: center;
+  position: relative;
+}
+
+.front .frame-5 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.front .text-wrapper-5 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: var(--menu-l-poppins-m-font-family);
+  font-weight: var(--menu-l-poppins-m-font-weight);
+  color: #10b981;
+  font-size: var(--menu-l-poppins-m-font-size);
+  letter-spacing: var(--menu-l-poppins-m-letter-spacing);
+  line-height: var(--menu-l-poppins-m-line-height);
+  white-space: nowrap;
+  font-style: var(--menu-l-poppins-m-font-style);
+}
+
+.front .component-chosen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.front .text-wrapper-6 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Poppins", Helvetica;
+  font-weight: 400;
+  color: #3b3b3b;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+.front .component-button-wrapper {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  align-self: stretch;
+  width: 100%;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.front .frame-wrapper {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  position: relative;
+  flex: 0 0 auto;
+  background-color: #34d399;
+  border-radius: 5px;
+}
+
+.front .choose-file {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: var(--menu-l-poppins-m-font-family);
+  font-weight: var(--menu-l-poppins-m-font-weight);
+  color: #ffffff;
+  font-size: var(--menu-l-poppins-m-font-size);
+  letter-spacing: var(--menu-l-poppins-m-letter-spacing);
+  line-height: var(--menu-l-poppins-m-line-height);
+  white-space: nowrap;
+  font-style: var(--menu-l-poppins-m-font-style);
+}
+
+.front .divider-line {
+  margin-left: 24px;
+  width: 499px;
+  height: 1px;
+  object-fit: cover;
+}
+
+.front .sample-file-cta {
+  margin-left: 24px;
+  width: 309px;
+  height: 44px;
+  margin-top: 20px;
+  display: flex;
+  gap: 8px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid;
+  border-color: #cbcbcb;
+}
+
+.front .download {
+  margin-top: 10px;
+  width: 27px;
+  height: 24px;
+  position: relative;
+  margin-left: 24px;
+}
+
+.front .icon {
+  position: absolute;
+  width: 75.00%;
+  height: 75.00%;
+  top: 6.25%;
+  left: 0;
+}
+
+.front .text-wrapper-7 {
+  margin-top: 12.5px;
+  width: 226px;
+  height: 19px;
+  font-family: "Inter", Helvetica;
+  font-weight: 400;
+  color: #5f6260;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.front .button {
+  width: 547px;
+  height: 72px;
+  margin-top: 33px;
+  display: flex;
+  gap: 16px;
+  background-color: #ffffff;
+  border-radius: 0px 0px 8px 8px;
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-color: #e3e3e3;
+}
+
+.front .secondary-button {
+  all: unset;
+  box-sizing: border-box;
+  margin-top: 14px;
+  width: 101px;
+  height: 44px;
+  margin-left: 305px;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid;
+  border-color: #cacaca;
+}
+
+.front .label {
+  color: #232222;
+  margin-top: 12.5px;
+  width: 53px;
+  height: 19px;
+  margin-left: 24px;
+  font-family: "Inter", Helvetica;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.front .primary-button {
+  all: unset;
+  box-sizing: border-box;
+  margin-top: 14px;
+  width: 101px;
+  height: 44px;
+  display: flex;
+  background-color: #1677ff;
+  border-radius: 8px;
+}
+
+.front .label-2 {
+  color: #ffffff;
+  margin-top: 12.5px;
+  width: 53px;
+  height: 19px;
+  margin-left: 24px;
+  font-family: "Inter", Helvetica;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.front .product-info-card {
+  position: absolute;
+  top: 0;
+  left: 658px;
+  width: 384px;
+  height: 488px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-400);
+  background-color: var(--color-background-default-default);
+  border-radius: var(--size-radius-200);
+  border: 1px solid;
+  border-color: var(--color-border-default-default);
+}
+
+.front .image-2 {
+  margin-left: 16px;
+  width: 352px;
+  height: 247px;
+  margin-top: 16px;
+  background-image: url(https://c.animaapp.com/DnqGvymX/img/image-4.svg);
+  background-size: cover;
+  background-position: 50% 50%;
+}
+
+.front .body-2 {
+  margin-left: 16px;
+  width: 352px;
+  height: 155px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-200);
+}
+
+.front .div-wrapper {
+  width: 352px;
+  display: flex;
+}
+
+.front .text-wrapper-8 {
+  width: 55px;
+  height: 22px;
+  font-family: var(--body-base-font-family);
+  font-weight: var(--body-base-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--body-base-font-size);
+  letter-spacing: var(--body-base-letter-spacing);
+  line-height: var(--body-base-line-height);
+  white-space: nowrap;
+  font-style: var(--body-base-font-style);
+}
+
+.front .text-strong {
+  width: 59px;
+  display: flex;
+}
+
+.front .text-wrapper-9 {
+  width: 59px;
+  height: 22px;
+  font-family: var(--body-strong-font-family);
+  font-weight: var(--body-strong-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--body-strong-font-size);
+  letter-spacing: var(--body-strong-letter-spacing);
+  line-height: var(--body-strong-line-height);
+  white-space: nowrap;
+  font-style: var(--body-strong-font-style);
+}
+
+.front .text-wrapper-10 {
+  width: 48px;
+  height: 20px;
+  font-family: var(--body-small-font-family);
+  font-weight: var(--body-small-font-weight);
+  color: var(--color-text-default-secondary);
+  font-size: var(--body-small-font-size);
+  letter-spacing: var(--body-small-letter-spacing);
+  line-height: var(--body-small-line-height);
+  white-space: nowrap;
+  font-style: var(--body-small-font-style);
+}
+
+.front .text-strong-2 {
+  width: 47px;
+  display: flex;
+}
+
+.front .text-wrapper-11 {
+  width: 47px;
+  height: 22px;
+  font-family: var(--body-strong-font-family);
+  font-weight: var(--body-strong-font-weight);
+  color: var(--color-text-default-default);
+  font-size: var(--body-strong-font-size);
+  letter-spacing: var(--body-strong-letter-spacing);
+  line-height: var(--body-strong-line-height);
+  white-space: nowrap;
+  font-style: var(--body-strong-font-style);
+}
+
+.front .text-small {
+  width: 352px;
+  height: 37px;
+  display: flex;
+}
+
+.front .text-wrapper-12 {
+  width: 216px;
+  height: 20px;
+  font-family: var(--body-small-font-family);
+  font-weight: var(--body-small-font-weight);
+  color: var(--color-text-default-secondary);
+  font-size: var(--body-small-font-size);
+  letter-spacing: var(--body-small-letter-spacing);
+  line-height: var(--body-small-line-height);
+  white-space: nowrap;
+  font-style: var(--body-small-font-style);
+}
+
+.front .footer {
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  min-height: 100px;
+  background-color: var(--color-background-default-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.front details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--size-space-200);
+  padding: var(--size-padding-lg);
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+  background-color: var(--color-background-default-default);
+  border-radius: var(--size-radius-200);
+  border: 1px solid;
+  border-color: var(--color-border-default-default);
+}
+
+.front details[open] {
+  background-color: var(--color-background-default-default);
+}
+
+.front details:not([open]) {
+  background-color: var(--color-background-default-secondary);
+  padding: var(--size-padding-lg);
+}
+
+.front summary {
+  display: flex;
+  align-items: center;
+  gap: var(--size-space-200);
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  list-style: none;
+}
+
+.front summary::-webkit-details-marker {
+  display: none;
+}
+
+.front summary:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.front label[for="mri-upload"] {
+  cursor: pointer;
+}
+
+.front input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.front input[type="file"]:focus + .component-button .frame-5 {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.front .component-button label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.front button {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.front button:hover {
+  opacity: 0.9;
+}
+
+.front button:active {
+  opacity: 0.8;
+}
+
+.front button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.front .divider-line {
+  border: none;
+  border-top: 1px solid var(--color-border-default-default);
+  margin: 19px 0 0 24px;
+  width: 499px;
+  height: 0;
+}
+
+.front output {
+  display: block;
+}
+
+.front .footer-wrapper {
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+}

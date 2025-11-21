@@ -26,12 +26,14 @@ flask_app/
 ├── requirements.txt
 ├── templates/
 │   ├── index.html
-│   └── about.html
+│   └── index.html
 └── static/
     └── css/
+    │   ├── globals.css
+    │   ├── script.js
+    │   ├── styleguide.css
         └── styles.css
 ```
 
-- `app.py`: Main Flask application with two routes (`/` and `/about`).
+- `app.py`: Main Flask application with one routes (`/`).
 - `templates/`: Jinja2 HTML templates.
-- `static/css/styles.css`: Example stylesheet to confirm static files work.

@@ -1,24 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ title }}</title>
-  <!-- Bootstrap 4.5.2 CDN -->
-  <link
-    rel="stylesheet"
-    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-  />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
-</head>
-<body>
-  <div class="container py-5">
-    <h1 class="display-4 mb-3">Welcome to Flask!</h1>
-    <p class="lead">This is the starter page rendered from <code>templates/index.html</code>.</p>
-    <a href="{{ url_for('about') }}" class="btn btn-primary mt-3">Go to About</a>
-  </div>
-  <h1>This is a Heading</h1>
-  <p>This is paragraph 1.</p>
-  <p>This is paragraph 2.</p>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleguide.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  </head>
+  <body>
+    <main class="front" data-model-id="7:895">
+      <div class="component">
+        <header class="hero-basic">
+          <div class="text-content-title">
+            <h1 class="title">Brain MRI Classification</h1>
+            <p class="subtitle">DS5110 Final Project<br />Sri Divija Enturi, Reha Jambavadekar, Jessica Pham</p>
+          </div>
+        </header>
+        <section class="page-accordion">
+          <div class="text-content-heading">
+            <h2 class="text-wrapper">Heading</h2>
+            <p class="div">Subheading</p>
+          </div>
+          <div class="accordion" role="region" aria-label="Project Information">
+            <details class="accordion-item" open>
+              <summary class="accordion-title">
+                <span class="text-wrapper-2">Tools</span>
+                <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
+              </summary>
+              <div class="accordion-content">
+                <p class="body">
+                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
+                </p>
+              </div>
+            </details>
+            <details class="accordion-title-wrapper">
+              <summary class="accordion-title-2">
+                <span class="text-wrapper-2">Methodology</span>
+                <img
+                  class="img"
+                  src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </summary>
+            </details>
+            <details class="accordion-title-wrapper">
+              <summary class="accordion-title-2">
+                <span class="text-wrapper-2">Timeline</span>
+                <img
+                  class="img"
+                  src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </summary>
+            </details>
+            <details class="accordion-title-wrapper">
+              <summary class="accordion-title-2">
+                <span class="text-wrapper-2">Title</span>
+                <img
+                  class="img"
+                  src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </summary>
+            </details>
+            <details class="accordion-title-wrapper">
+              <summary class="accordion-title-2">
+                <span class="text-wrapper-2">Title</span>
+                <img
+                  class="img"
+                  src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </summary>
+            </details>
+          </div>
+        </section>
+        <section class="panel-image-content">
+          <div class="image" role="img" aria-label="Brain MRI scan visualization"></div>
+          <div class="text-content-flow">
+            <div class="text-content-heading-2">
+              <h2 class="text-wrapper-3">Heading</h2>
+              <p class="text-wrapper-4">Subheading</p>
+            </div>
+            <div class="text">
+              <p class="p">
+                Body text for your whole article or post. We'll put in some lorem ipsum to show how a filled-out page
+                might look:
+              </p>
+            </div>
+            <div class="text">
+              <p class="p">
+                Excepteur efficient emerging, minim veniam anim aute carefully curated Ginza conversation exquisite
+                perfect nostrud nisi intricate Content. Qui&nbsp;&nbsp;international first-class nulla ut. Punctual
+                adipisicing, essential lovely queen tempor eiusmod irure. Exclusive izakaya charming Scandinavian
+                impeccable aute quality of life soft power pariatur Melbourne occaecat discerning. Qui wardrobe aliquip,
+                et Porter destination Toto remarkable officia Helsinki excepteur Basset hound. Zürich sleepy perfect
+                consectetur.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section class="frame">
+          <div class="frame-2">
+            <article class="upload-file">
+              <header class="header"><h2 class="title-2">Try it out for yourself!</h2></header>
+              <div class="content">
+                <form
+                  id="upload-form"
+                  class="component-upload"
+                  method="post"
+                  enctype="multipart/form-data"
+                  aria-label="MRI Image Upload Form"
+                >
+                  <div class="frame-3">
+                    <img
+                      id="preview-image"
+                      class="component-2"
+                      src="https://c.animaapp.com/DnqGvymX/img/component-placeholder-image-2@2x.png"
+                      alt="MRI image placeholder"
+                    />
+                    <div class="frame-4">
+                      <label for="mri-upload" class="please-upload-square">Upload a MRI Brain Image</label>
+                      <div class="component-upload-2">
+                        <div class="component-button">
+                          <label for="mri-upload" class="frame-5">
+                            <span class="text-wrapper-5">Choose File</span>
+                          </label>
+                          <input
+                            type="file"
+                            id="mri-upload"
+                            name="mri-upload"
+                            accept="image/*"
+                            aria-describedby="file-chosen"
+                            hidden
+                          />
+                        </div>
+                        <div class="component-chosen">
+                          <span class="text-wrapper-6" id="file-chosen" aria-live="polite">No File Chosen</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="component-button-wrapper">
+                    <button type="button" id="save-btn" class="frame-wrapper" aria-label="Save uploaded image" disabled>
+                      <span class="frame-5"><span class="choose-file">Save</span></span>
+                    </button>
+                  </div>
+                </form>
+                <hr class="divider-line" aria-hidden="true" />
+                <div class="sample-file-cta">
+                  <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Download Random MRI Image">
+                    <div class="download">
+                      <img class="icon" src="https://c.animaapp.com/DnqGvymX/img/icon-1.png" alt="Download icon" />
+                    </div>
+                  </a>
+                  <span class="text-wrapper-7">Download Random MRI Image</span>
+                </div>
+              </div>
+              <footer class="button">
+                <button type="button" id="cancel-btn" class="secondary-button" aria-label="Cancel operation">
+                  <span class="label">Cancel</span>
+                </button>
+                <button type="button" id="submit-btn" class="primary-button" aria-label="Submit MRI image for classification" disabled>
+                  <span class="label-2">Submit</span>
+                </button>
+              </footer>
+            </article>
+            <aside class="product-info-card" aria-label="Classification Results">
+              <div id="result-image" class="image-2" role="img" aria-label="Result visualization"></div>
+              <div class="body-2">
+                <div class="div-wrapper"><h3 class="text-wrapper-8">Results</h3></div>
+                <div class="text-strong"><span class="text-wrapper-9">Tumor?</span></div>
+                <div class="div-wrapper"><output id="tumor-result" class="text-wrapper-10" aria-live="polite">-</output></div>
+                <div class="text-strong-2"><span class="text-wrapper-11">Type?</span></div>
+                <div class="text-small">
+                  <output id="type-result" class="text-wrapper-12" aria-live="polite">-</output>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+        <footer class="footer-wrapper">
+          <div class="footer">
+            <p style="text-align: center; padding: 20px; color: var(--color-text-default-secondary);">
+              © 2024 Brain MRI Classification - DS5110 Final Project
+            </p>
+          </div>
+        </footer>
+      </div>
+    </main>
+    <script src="{{ url_for('static', filename='css/script.js') }}"></script>
+  </body>
 </html>
