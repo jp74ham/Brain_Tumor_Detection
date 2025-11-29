@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Database Query Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleguide.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/database.css') }}" />
+  </head>
+  <body>
+    <div class="database-container">
+      <header class="database-header">
+        <h1>Database Query Interface</h1>
+        <div class="header-actions">
+          <span class="username">Logged in as: admin</span>
+          <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+      </header>
+
+      <main class="database-main">
+        <div class="query-section">
+          <h2>Execute SQL Query</h2>
+          <p class="info-text">Only SELECT queries are allowed for security.</p>
+          
+          <div class="query-input-container">
+            <textarea id="query-input" placeholder="Enter your SQL query here...
+Example:
+SELECT * FROM mri_scans LIMIT 10;"></textarea>
+            <button id="execute-btn" class="execute-btn">Execute Query</button>
+          </div>
+
+          <div class="sample-queries">
+            <h3>Sample Queries:</h3>
+            <button class="sample-query-btn" data-query="SELECT * FROM mri_scans LIMIT 10;">All MRI Scans (10)</button>
+            <button class="sample-query-btn" data-query="SELECT label, COUNT(*) as count FROM mri_scans GROUP BY label;">Count by Label</button>
+            <button class="sample-query-btn" data-query="SELECT * FROM mri_scans WHERE label = 'glioma_tumor' LIMIT 5;">Glioma Cases</button>
+            <button class="sample-query-btn" data-query="SELECT gender, label, COUNT(*) as total FROM mri_scans GROUP BY gender, label;">Gender Distribution</button>
+          </div>
+        </div>
+
+        <div class="results-section">
+          <h2>Query Results</h2>
+          <div id="results-container">
+            <p class="no-results">No query executed yet. Enter a query above and click "Execute Query".</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='css/database.js') }}"></script>
+  </body>
+</html>

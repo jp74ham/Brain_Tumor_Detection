@@ -107,7 +107,7 @@ cancelBtn.addEventListener('click', function() {
 
 // Image modal functionality for query results
 document.addEventListener('DOMContentLoaded', function() {
-  // Create modal element
+  // Create image modal element
   const modal = document.createElement('div');
   modal.className = 'image-modal';
   modal.innerHTML = `
@@ -144,6 +144,196 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && modal.classList.contains('active')) {
       modal.classList.remove('active');
+    }
+  });
+
+  // Create login modal
+  const loginModal = document.createElement('div');
+  loginModal.className = 'login-modal';
+  loginModal.innerHTML = `
+    <div class="login-modal-content">
+      <div class="login-modal-header">
+        <h2>Database Login</h2>
+        <p>Enter your credentials to access the database query interface</p>
+      </div>
+      <form class="login-form" id="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        <div class="login-error" id="login-error"></div>
+        <div class="login-actions">
+          <button type="button" class="login-cancel" id="login-cancel">Cancel</button>
+          <button type="submit" class="login-submit" id="login-submit">Login</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(loginModal);
+
+  // Create patient login modal
+  const patientLoginModal = document.createElement('div');
+  patientLoginModal.className = 'login-modal';
+  patientLoginModal.innerHTML = `
+    <div class="login-modal-content">
+      <div class="login-modal-header">
+        <h2>Patient Login</h2>
+        <p>Enter your Patient ID to view your medical records</p>
+      </div>
+      <form class="login-form" id="patient-login-form">
+        <div class="form-group">
+          <label for="patient-id">Patient ID</label>
+          <input type="text" id="patient-id" name="patient_id" required placeholder="Enter your patient ID">
+        </div>
+        <div class="login-error" id="patient-login-error"></div>
+        <div class="login-actions">
+          <button type="button" class="login-cancel" id="patient-login-cancel">Cancel</button>
+          <button type="submit" class="login-submit" id="patient-login-submit">Access Records</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(patientLoginModal);
+
+  const loginBtn = document.getElementById('admin-login-btn');
+  const loginForm = document.getElementById('login-form');
+  const loginCancelBtn = document.getElementById('login-cancel');
+  const loginSubmitBtn = document.getElementById('login-submit');
+  const loginError = document.getElementById('login-error');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+
+  const patientLoginBtn = document.getElementById('patient-login-btn');
+  const patientLoginForm = document.getElementById('patient-login-form');
+  const patientLoginCancelBtn = document.getElementById('patient-login-cancel');
+  const patientLoginSubmitBtn = document.getElementById('patient-login-submit');
+  const patientLoginError = document.getElementById('patient-login-error');
+  const patientIdInput = document.getElementById('patient-id');
+
+  // Open admin login modal
+  if (loginBtn) {
+    loginBtn.addEventListener('click', function() {
+      loginModal.classList.add('active');
+      usernameInput.focus();
+      loginError.classList.remove('active');
+    });
+  }
+
+  // Open patient login modal
+  if (patientLoginBtn) {
+    patientLoginBtn.addEventListener('click', function() {
+      patientLoginModal.classList.add('active');
+      patientIdInput.focus();
+      patientLoginError.classList.remove('active');
+    });
+  }
+
+  // Close admin login modal
+  loginCancelBtn.addEventListener('click', function() {
+    loginModal.classList.remove('active');
+    loginForm.reset();
+    loginError.classList.remove('active');
+  });
+
+  // Close patient login modal
+  patientLoginCancelBtn.addEventListener('click', function() {
+    patientLoginModal.classList.remove('active');
+    patientLoginForm.reset();
+    patientLoginError.classList.remove('active');
+  });
+
+  // Close on background click - admin
+  loginModal.addEventListener('click', function(e) {
+    if (e.target === loginModal) {
+      loginModal.classList.remove('active');
+      loginForm.reset();
+      loginError.classList.remove('active');
+    }
+  });
+
+  // Close on background click - patient
+  patientLoginModal.addEventListener('click', function(e) {
+    if (e.target === patientLoginModal) {
+      patientLoginModal.classList.remove('active');
+      patientLoginForm.reset();
+      patientLoginError.classList.remove('active');
+    }
+  });
+
+  // Handle admin login form submission
+  loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    
+    loginSubmitBtn.disabled = true;
+    loginSubmitBtn.textContent = 'Logging in...';
+    loginError.classList.remove('active');
+    
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        window.location.href = result.redirect;
+      } else {
+        loginError.textContent = result.error || 'Invalid credentials';
+        loginError.classList.add('active');
+      }
+    } catch (error) {
+      loginError.textContent = 'Network error: ' + error.message;
+      loginError.classList.add('active');
+    } finally {
+      loginSubmitBtn.disabled = false;
+      loginSubmitBtn.textContent = 'Login';
+    }
+  });
+
+  // Handle patient login form submission
+  patientLoginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const patientId = patientIdInput.value.trim();
+    
+    patientLoginSubmitBtn.disabled = true;
+    patientLoginSubmitBtn.textContent = 'Accessing...';
+    patientLoginError.classList.remove('active');
+    
+    try {
+      const response = await fetch('/patient_login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ patient_id: patientId })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        window.location.href = result.redirect;
+      } else {
+        patientLoginError.textContent = result.error || 'Invalid Patient ID';
+        patientLoginError.classList.add('active');
+      }
+    } catch (error) {
+      patientLoginError.textContent = 'Network error: ' + error.message;
+      patientLoginError.classList.add('active');
+    } finally {
+      patientLoginSubmitBtn.disabled = false;
+      patientLoginSubmitBtn.textContent = 'Access Records';
     }
   });
 });

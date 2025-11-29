@@ -1077,3 +1077,174 @@
 .front .etl-list li:last-child {
   margin-bottom: 0;
 }
+
+/* Header Buttons Container */
+.header-buttons {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 100;
+}
+
+/* Patient Login Button */
+.patient-login-button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.patient-login-button:hover {
+  background-color: #218838;
+}
+
+/* Admin Login Button */
+.admin-login-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-login-button:hover {
+  background-color: #0056b3;
+}
+
+/* Login Modal */
+.login-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.login-modal.active {
+  display: flex;
+}
+
+.login-modal-content {
+  background-color: white;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+}
+
+.login-modal-header {
+  margin-bottom: 24px;
+}
+
+.login-modal-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: var(--color-text-default-default);
+}
+
+.login-modal-header p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-default-secondary);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-default-default);
+}
+
+.form-group input {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid var(--color-border-default-default);
+  border-radius: 4px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.login-error {
+  display: none;
+  padding: 10px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  color: #721c24;
+  font-size: 14px;
+}
+
+.login-error.active {
+  display: block;
+}
+
+.login-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.login-actions button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-submit {
+  background-color: #007bff;
+  color: white;
+}
+
+.login-submit:hover {
+  background-color: #0056b3;
+}
+
+.login-submit:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.login-cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+.login-cancel:hover {
+  background-color: #5a6268;
+}

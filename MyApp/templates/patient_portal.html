@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Patient Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/globals.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleguide.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/patient_portal.css') }}" />
+  </head>
+  <body>
+    <div class="patient-container">
+      <header class="patient-header">
+        <h1>Patient Portal</h1>
+        <div class="header-actions">
+          <span class="patient-id-display">Patient ID: {{ patient_id }}</span>
+          <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+      </header>
+
+      <main class="patient-main">
+        <div class="welcome-section">
+          <h2>Welcome to Your Medical Records</h2>
+          <p>Below are your MRI scan records. Click on any record to view more details.</p>
+        </div>
+
+        <div class="records-section">
+          <h2>Your MRI Scan Records</h2>
+          <div id="records-container">
+            <p class="loading">Loading your records...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='css/patient_portal.js') }}"></script>
+  </body>
+</html>
