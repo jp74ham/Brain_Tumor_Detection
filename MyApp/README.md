@@ -35,5 +35,5 @@ flask_app/
         └── styles.css
 ```
 
-- `app.py`: Main Flask application with one routes (`/`).
+- `app.py`: Main Flask application with one route (`/`).
 - `templates/`: Jinja2 HTML templates.
