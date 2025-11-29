@@ -104,3 +104,46 @@ cancelBtn.addEventListener('click', function() {
   saveBtn.disabled = true;
   submitBtn.disabled = true;
 });
+
+// Image modal functionality for query results
+document.addEventListener('DOMContentLoaded', function() {
+  // Create modal element
+  const modal = document.createElement('div');
+  modal.className = 'image-modal';
+  modal.innerHTML = `
+    <span class="image-modal-close">&times;</span>
+    <img src="" alt="Enlarged view">
+  `;
+  document.body.appendChild(modal);
+  
+  const modalImg = modal.querySelector('img');
+  const closeBtn = modal.querySelector('.image-modal-close');
+  
+  // Add click handlers to all query images
+  document.querySelectorAll('.query-image').forEach(img => {
+    img.addEventListener('click', function() {
+      modal.classList.add('active');
+      modalImg.src = this.src;
+      modalImg.alt = this.alt;
+    });
+  });
+  
+  // Close modal on click
+  closeBtn.addEventListener('click', function() {
+    modal.classList.remove('active');
+  });
+  
+  // Close modal on background click
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+  
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      modal.classList.remove('active');
+    }
+  });
+});

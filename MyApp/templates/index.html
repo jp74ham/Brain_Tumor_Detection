@@ -16,27 +16,31 @@
             <p class="subtitle">DS5110 Final Project<br />Sri Divija Enturi, Reha Jambavadekar, Jessica Pham</p>
           </div>
         </header>
+        <h2 class="text-wrapper-3">Schema and ER diagram</h2>
         <section class="panel-image-content">
           <div class="image" role="img" aria-label="Brain MRI scan visualization"></div>
           <div class="text-content-flow">
-            <div class="text-content-heading-2">
-              <h2 class="text-wrapper-3">Heading</h2>
-              <p class="text-wrapper-4">Subheading</p>
-            </div>
+            <p class="text-wrapper-4">Consists of five key entities</p>
             <div class="text">
               <p class="p">
-                Body text for your whole article or post. We'll put in some lorem ipsum to show how a filled-out page
-                might look:
+                <ul class="etl-list">
+                  <li> Patients table stores anonymized patient data including demographics and scan details</li>
+                  <li>MRI_Scans table holds metadata for each MRI image linked to patients</li>
+                  <li>Tumor_Classification table contains model predictions with tumor types and confidence scores</li>
+                  <li>Model_Performance table tracks accuracy metrics over time</li>
+                  <li>User_Roles table manages access levels for different users.</li>
+                </ul>
               </p>
             </div>
+            <p class="text-wrapper-4">Relationships</p>
             <div class="text">
               <p class="p">
-                Excepteur efficient emerging, minim veniam anim aute carefully curated Ginza conversation exquisite
-                perfect nostrud nisi intricate Content. Qui&nbsp;&nbsp;international first-class nulla ut. Punctual
-                adipisicing, essential lovely queen tempor eiusmod irure. Exclusive izakaya charming Scandinavian
-                impeccable aute quality of life soft power pariatur Melbourne occaecat discerning. Qui wardrobe aliquip,
-                et Porter destination Toto remarkable officia Helsinki excepteur Basset hound. Zürich sleepy perfect
-                consectetur.
+                <ul class="etl-list">
+                  <li>One Patient can have multiple MRI_Scans (1-to-Many)</li>
+                  <li>Each MRI_Scan has one Tumor_Classification (1-to-1)</li>
+                  <li>Multiple Tumor_Classification can reference a single Model_Performance record (Many-to-1)</li>
+                  <li>A User_Role can be associated with multiple MRI uploads (1-to-Many)</li>
+                </ul>
               </p>
             </div>
           </div>
@@ -95,14 +99,18 @@
                 <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
               </summary>
               <div class="accordion-content">
-                <p class="body">
-                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
-                </p>
+                <ul class="etl-list">
+                  <li>Extract: Downloaded brain MRI images from Kaggle dataset containing 4 tumor types (glioma, meningioma, pituitary, no_tumor)</li>
+                  <li>Transform: Preprocessed images - resized to 224x224, converted to RGB, normalized pixel values, and extracted metadata</li>
+                  <li>Load: Populated SQLite database with 5 tables - Patients (500 synthetic records using Faker), MRI_Scans, Tumor_Classification, Model_Performance, and User_Roles</li>
+                  <li>Created relational links between patients, scans, and classifications with proper foreign key constraints</li>
+                  <li>Generated ground truth labels from dataset folder structure for model training and validation</li>
+                </ul>
               </div>
             </details>
             <details class="accordion-item">
               <summary class="accordion-title">
-                <span class="text-wrapper-2">Queries</span>
+                <span class="text-wrapper-2">Queries (click result images to enlarge) </span>
                 <img
                   class="img"
                   src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
@@ -115,15 +123,12 @@
                   <!-- Query 1: Tumor Distribution -->
                   <div class="query-pair">
                     <div class="query-code-container">
-                      <p class="query-label">Query 1: Number of detected tumors by type</p>
-                      <pre class="query-code">SELECT
-    tumor_type,
-    COUNT(*) as count,
-    ROUND(COUNT(*) * 100.0 / 
-        (SELECT COUNT(*) FROM Tumor_Classification), 2) as percentage
-FROM Tumor_Classification
-GROUP BY tumor_type
-ORDER BY count DESC;</pre>
+                      <p class="query-label">Query 1: Total cases by tumor type</p>
+                      <pre class="query-code">SELECT label AS tumor_type,
+       COUNT(*) AS total_cases
+FROM mri_scans
+GROUP BY label
+ORDER BY total_cases DESC;</pre>
                     </div>
                     <div class="query-image-container">
                       <img src="{{ url_for('static', filename='images/query1_result.png') }}" alt="Query 1 Result" class="query-image">
@@ -133,107 +138,84 @@ ORDER BY count DESC;</pre>
                   <!-- Query 2: Age Demographics -->
                   <div class="query-pair">
                     <div class="query-code-container">
-                      <p class="query-label">Query 2: Tumor distribution by age groups</p>
+                      <p class="query-label">Query 2: Age group analysis with average image area</p>
                       <pre class="query-code">SELECT
     CASE
-        WHEN p.age < 30 THEN '18-29'
-        WHEN p.age < 50 THEN '30-49'
-        WHEN p.age < 70 THEN '50-69'
-        ELSE '70+'
-    END as age_group,
-    tc.tumor_type,
-    COUNT(*) as count
-FROM Patients p
-JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
-JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
-GROUP BY age_group, tc.tumor_type
-ORDER BY age_group, count DESC;</pre>
+        WHEN age BETWEEN 20 AND 29 THEN '20s'
+        WHEN age BETWEEN 30 AND 39 THEN '30s'
+        WHEN age BETWEEN 40 AND 49 THEN '40s'
+        WHEN age BETWEEN 50 AND 59 THEN '50s'
+        WHEN age BETWEEN 60 AND 69 THEN '60s'
+        ELSE '70s+'
+    END AS age_group,
+    label,
+    AVG(orig_width * orig_height) AS avg_area,
+    COUNT(*) AS cases
+FROM mri_scans
+GROUP BY age_group, label
+ORDER BY age_group;</pre>
                     </div>
                     <div class="query-image-container">
                       <img src="{{ url_for('static', filename='images/query2_result.png') }}" alt="Query 2 Result" class="query-image">
                       <p class="query-label">Query Result</p>
                     </div>
                   </div>
-                  <!-- Query 3: Confidence Scores -->
+                  <!-- Query 3: Hospital Unit Distribution -->
                   <div class="query-pair">
                     <div class="query-code-container">
-                      <p class="query-label">Query 3: Average classification confidence per tumor type</p>
-                      <pre class="query-code">SELECT
-    tumor_type,
-    ROUND(AVG(confidence_score), 4) as avg_confidence,
-    ROUND(MIN(confidence_score), 4) as min_confidence,
-    ROUND(MAX(confidence_score), 4) as max_confidence,
-    COUNT(*) as total_cases
-FROM Tumor_Classification
-GROUP BY tumor_type
-ORDER BY avg_confidence DESC;</pre>
+                      <p class="query-label">Query 3: Cases by hospital unit and tumor type</p>
+                      <pre class="query-code">SELECT hospital_unit,
+       label AS tumor_type,
+       COUNT(*) AS cases
+FROM mri_scans
+GROUP BY hospital_unit, label
+ORDER BY hospital_unit, cases DESC;</pre>
                     </div>
                     <div class="query-image-container">
                       <img src="{{ url_for('static', filename='images/query3_result.png') }}" alt="Query 3 Result" class="query-image">
                       <p class="query-label">Query Result</p>
                     </div>
                   </div>
-                  <!-- Query 4: Detection Trends -->
+                  <!-- Query 4: Gender Distribution -->
                   <div class="query-pair">
                     <div class="query-code-container">
-                      <p class="query-label">Query 4: Detection trends by scan date and hospital</p>
-                      <pre class="query-code">SELECT
-    strftime('%Y-%m', p.date_of_scan) as scan_month,
-    p.hospital_name,
-    tc.tumor_type,
-    COUNT(*) as cases
-FROM Patients p
-JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
-JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
-WHERE tc.tumor_type != 'no_tumor'
-GROUP BY scan_month, p.hospital_name, tc.tumor_type
-ORDER BY scan_month DESC, cases DESC
-LIMIT 20;</pre>
+                      <p class="query-label">Query 4: Total cases by gender and tumor type</p>
+                      <pre class="query-code">SELECT gender, label AS tumor_type, COUNT(*) AS total
+FROM mri_scans
+GROUP BY gender, tumor_type
+ORDER BY gender;</pre>
                     </div>
                     <div class="query-image-container">
                       <img src="{{ url_for('static', filename='images/query4_result.png') }}" alt="Query 4 Result" class="query-image">
                       <p class="query-label">Query Result</p>
                     </div>
                   </div>
-                  <!-- Query 5: Gender Distribution -->
+                  <!-- Query 5: Glioma Cases -->
                   <div class="query-pair">
                     <div class="query-code-container">
-                      <p class="query-label">Query 5: Tumor cases by gender</p>
-                      <pre class="query-code">SELECT
-    p.gender,
-    tc.tumor_type,
-    COUNT(*) as count,
-    ROUND(AVG(p.age), 1) as avg_age
-FROM Patients p
-JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
-JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
-WHERE tc.tumor_type != 'no_tumor'
-GROUP BY p.gender, tc.tumor_type
-ORDER BY count DESC;</pre>
+                      <p class="query-label">Query 5: Glioma tumor cases for patients over 50</p>
+                      <pre class="query-code">SELECT processed_path, age, gender, hospital_unit
+FROM mri_scans
+WHERE label = 'glioma_tumor'
+  AND age > 50
+LIMIT 100;</pre>
                     </div>
                     <div class="query-image-container">
                       <img src="{{ url_for('static', filename='images/query5_result.png') }}" alt="Query 5 Result" class="query-image">
                       <p class="query-label">Query Result</p>
                     </div>
                   </div>
-                  <!-- Query 6: Age Correlation -->
+                  <!-- Query 6: Weekly Trends -->
                   <div class="query-pair">
                     <div class="query-code-container">
-                      <p class="query-label">Query 6: Patient age vs tumor frequency correlation</p>
+                      <p class="query-label">Query 6: Weekly case trends by tumor type</p>
                       <pre class="query-code">SELECT
-    p.age,
-    COUNT(DISTINCT ms.scan_id) as total_scans,
-    SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
-        THEN 1 ELSE 0 END) as tumor_scans,
-    ROUND(SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
-        THEN 1 ELSE 0 END) * 100.0 /
-        COUNT(DISTINCT ms.scan_id), 2) as tumor_percentage
-FROM Patients p
-JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
-JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
-GROUP BY p.age
-HAVING total_scans > 0
-ORDER BY p.age;</pre>
+    STRFTIME('%Y-%W', scan_date) AS week,
+    label AS tumor_type,
+    COUNT(*) AS cases
+FROM mri_scans
+GROUP BY week, tumor_type
+ORDER BY week;</pre>
                     </div>
                     <div class="query-image-container">
                       <img src="{{ url_for('static', filename='images/query6_result.png') }}" alt="Query 6 Result" class="query-image">
