@@ -7,6 +7,7 @@ This is a minimal Flask app created from the provided tutorial.
 ```bash
 # 1) (Optional) Create and activate a virtual environment
 python -m venv .venv
+# reactivate virt environment:
 # Windows: .venv\Scripts\activate
 # macOS/Linux: source .venv/bin/activate
 
