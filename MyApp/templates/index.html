@@ -12,7 +12,7 @@
       <div class="component">
         <header class="hero-basic">
           <div class="text-content-title">
-            <h1 class="title">Brain MRI Classification</h1>
+            <h1 class="title">Brain Tumor MRI Detection and Classification</h1>
             <p class="subtitle">DS5110 Final Project<br />Sri Divija Enturi, Reha Jambavadekar, Jessica Pham</p>
           </div>
         </header>
@@ -57,8 +57,8 @@
                 </p>
               </div>
             </details>
-            <details class="accordion-title-wrapper">
-              <summary class="accordion-title-2">
+            <details class="accordion-item">
+              <summary class="accordion-title">
                 <span class="text-wrapper-2">Methodology</span>
                 <img
                   class="img"
@@ -73,8 +73,8 @@
                 </p>
               </div>
             </details>
-            <details class="accordion-title-wrapper">
-              <summary class="accordion-title-2">
+            <details class="accordion-item">
+              <summary class="accordion-title">
                 <span class="text-wrapper-2">Timeline</span>
                 <img
                   class="img"
@@ -89,9 +89,20 @@
                 </p>
               </div>
             </details>
-            <details class="accordion-title-wrapper">
-              <summary class="accordion-title-2">
-                <span class="text-wrapper-2">ETL Pipeline and Queries</span>
+            <details class="accordion-item" open>
+              <summary class="accordion-title">
+                <span class="text-wrapper-2">ETL Pipeline</span>
+                <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
+              </summary>
+              <div class="accordion-content">
+                <p class="body">
+                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
+                </p>
+              </div>
+            </details>
+            <details class="accordion-item">
+              <summary class="accordion-title">
+                <span class="text-wrapper-2">Queries</span>
                 <img
                   class="img"
                   src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
@@ -100,13 +111,208 @@
                 />
               </summary>
               <div class="accordion-content">
-                <p class="body">
-                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
-                </p>
+                <div class="query-results-grid">
+                  <!-- Query 1: Tumor Distribution -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 1: Number of detected tumors by type</p>
+                      <pre class="query-code">SELECT
+    tumor_type,
+    COUNT(*) as count,
+    ROUND(COUNT(*) * 100.0 / 
+        (SELECT COUNT(*) FROM Tumor_Classification), 2) as percentage
+FROM Tumor_Classification
+GROUP BY tumor_type
+ORDER BY count DESC;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query1_result.png') }}" alt="Query 1 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 2: Age Demographics -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 2: Tumor distribution by age groups</p>
+                      <pre class="query-code">SELECT
+    CASE
+        WHEN p.age < 30 THEN '18-29'
+        WHEN p.age < 50 THEN '30-49'
+        WHEN p.age < 70 THEN '50-69'
+        ELSE '70+'
+    END as age_group,
+    tc.tumor_type,
+    COUNT(*) as count
+FROM Patients p
+JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
+JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
+GROUP BY age_group, tc.tumor_type
+ORDER BY age_group, count DESC;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query2_result.png') }}" alt="Query 2 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 3: Confidence Scores -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 3: Average classification confidence per tumor type</p>
+                      <pre class="query-code">SELECT
+    tumor_type,
+    ROUND(AVG(confidence_score), 4) as avg_confidence,
+    ROUND(MIN(confidence_score), 4) as min_confidence,
+    ROUND(MAX(confidence_score), 4) as max_confidence,
+    COUNT(*) as total_cases
+FROM Tumor_Classification
+GROUP BY tumor_type
+ORDER BY avg_confidence DESC;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query3_result.png') }}" alt="Query 3 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 4: Detection Trends -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 4: Detection trends by scan date and hospital</p>
+                      <pre class="query-code">SELECT
+    strftime('%Y-%m', p.date_of_scan) as scan_month,
+    p.hospital_name,
+    tc.tumor_type,
+    COUNT(*) as cases
+FROM Patients p
+JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
+JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
+WHERE tc.tumor_type != 'no_tumor'
+GROUP BY scan_month, p.hospital_name, tc.tumor_type
+ORDER BY scan_month DESC, cases DESC
+LIMIT 20;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query4_result.png') }}" alt="Query 4 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 5: Gender Distribution -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 5: Tumor cases by gender</p>
+                      <pre class="query-code">SELECT
+    p.gender,
+    tc.tumor_type,
+    COUNT(*) as count,
+    ROUND(AVG(p.age), 1) as avg_age
+FROM Patients p
+JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
+JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
+WHERE tc.tumor_type != 'no_tumor'
+GROUP BY p.gender, tc.tumor_type
+ORDER BY count DESC;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query5_result.png') }}" alt="Query 5 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 6: Age Correlation -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 6: Patient age vs tumor frequency correlation</p>
+                      <pre class="query-code">SELECT
+    p.age,
+    COUNT(DISTINCT ms.scan_id) as total_scans,
+    SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
+        THEN 1 ELSE 0 END) as tumor_scans,
+    ROUND(SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
+        THEN 1 ELSE 0 END) * 100.0 /
+        COUNT(DISTINCT ms.scan_id), 2) as tumor_percentage
+FROM Patients p
+JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
+JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
+GROUP BY p.age
+HAVING total_scans > 0
+ORDER BY p.age;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query6_result.png') }}" alt="Query 6 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 7: Specific Tumor Cases -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 7: MRI scans for specific tumor types with patient info</p>
+                      <pre class="query-code">SELECT
+    ms.scan_id,
+    p.anonymized_id,
+    p.age,
+    p.gender,
+    ms.image_path,
+    tc.tumor_type,
+    tc.confidence_score,
+    p.hospital_name
+FROM MRI_Scans ms
+JOIN Patients p ON ms.patient_id = p.patient_id
+JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
+WHERE tc.tumor_type = 'glioma'
+ORDER BY tc.confidence_score DESC
+LIMIT 10;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query7_result.png') }}" alt="Query 7 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 8: Hospital Performance -->
+                  <div class="query-pair">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 8: Hospital performance statistics</p>
+                      <pre class="query-code">SELECT
+    p.hospital_name,
+    COUNT(DISTINCT p.patient_id) as total_patients,
+    COUNT(ms.scan_id) as total_scans,
+    SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
+        THEN 1 ELSE 0 END) as tumor_detections,
+    ROUND(SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
+        THEN 1 ELSE 0 END) * 100.0 /
+        COUNT(ms.scan_id), 2) as detection_rate
+FROM Patients p
+JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
+JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
+GROUP BY p.hospital_name
+ORDER BY total_scans DESC;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query8_result.png') }}" alt="Query 8 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                  <!-- Query 9: Recent Scans -->
+                  <div class="query-pair query-pair-single">
+                    <div class="query-code-container">
+                      <p class="query-label">Query 9: Most recent scans by tumor type</p>
+                      <pre class="query-code">SELECT
+    tc.tumor_type,
+    COUNT(*) as recent_count,
+    MAX(ms.upload_timestamp) as latest_scan
+FROM Tumor_Classification tc
+JOIN MRI_Scans ms ON tc.scan_id = ms.scan_id
+WHERE ms.upload_timestamp >= date('now', '-30 days')
+GROUP BY tc.tumor_type
+ORDER BY recent_count DESC;</pre>
+                    </div>
+                    <div class="query-image-container">
+                      <img src="{{ url_for('static', filename='images/query9_result.png') }}" alt="Query 9 Result" class="query-image">
+                      <p class="query-label">Query Result</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </details>
-            <details class="accordion-title-wrapper">
-              <summary class="accordion-title-2">
+            <details class="accordion-item">
+              <summary class="accordion-title">
                 <span class="text-wrapper-2">Training and Testing Results</span>
                 <img
                   class="img"

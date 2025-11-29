@@ -136,7 +136,7 @@
   flex-direction: column;
   max-width: 100%;
   width: 100%;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--size-space-400);
   position: relative; /* stay in normal flow so it expands the page */
 }
@@ -188,6 +188,7 @@
 
 .front .accordion-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
@@ -918,4 +919,79 @@
   position: relative;
   align-self: stretch;
   width: 100%;
+}
+
+/* Query Results Grid Styles */
+.front .query-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 1400px;
+  padding: 20px 0;
+  margin: 0 auto;
+}
+
+.front .query-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.front .query-pair-single {
+  grid-column: 1 / -1;
+  max-width: 50%;
+  justify-self: center;
+}
+
+.front .query-code-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--color-background-default-secondary);
+  border-radius: var(--size-radius-200);
+  padding: 16px;
+  border: 1px solid var(--color-border-default-default);
+  height: 100%;
+}
+
+.front .query-code {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-default-default);
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre;
+  flex-grow: 1;
+}
+
+.front .query-image-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--color-background-default-secondary);
+  border-radius: var(--size-radius-200);
+  padding: 12px;
+  border: 1px solid var(--color-border-default-default);
+}
+
+.front .query-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.front .query-label {
+  font-family: var(--body-base-font-family);
+  font-weight: var(--body-strong-font-weight);
+  font-size: var(--body-base-font-size);
+  color: var(--color-text-default-default);
+  text-align: center;
+  margin: 0;
 }
