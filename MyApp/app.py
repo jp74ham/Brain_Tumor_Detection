@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, jsonify, g, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, g, session, redirect, url_for, send_file
 import os
 import sqlite3
 from werkzeug.utils import secure_filename
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -65,6 +67,84 @@ def upload_file():
         return jsonify(result)
     
     return jsonify({'error': 'Invalid file type'}), 400
+
+@app.route('/image/<int:scan_id>')
+def get_image(scan_id):
+    """Serve MRI scan image or generate placeholder if not available"""
+    try:
+        db = get_db()
+        cursor = db.execute("""
+            SELECT original_path, processed_path, label 
+            FROM mri_scans 
+            WHERE rowid = ?
+        """, (scan_id,))
+        row = cursor.fetchone()
+        
+        if not row:
+            return jsonify({'error': 'Scan not found'}), 404
+        
+        # Try to find the image file locally
+        # Check multiple possible locations
+        original_path = row[0]
+        processed_path = row[1]
+        label = row[2]
+        
+        # Try to find the image in local directories
+        possible_paths = [
+            original_path,
+            processed_path,
+            original_path.replace('/content/', ''),
+            processed_path.replace('/content/', ''),
+            os.path.join('static', 'training_images', os.path.basename(original_path)),
+            os.path.join('static', 'training_images', os.path.basename(processed_path))
+        ]
+        
+        image_found = False
+        for path in possible_paths:
+            if path and os.path.exists(path):
+                return send_file(path, mimetype='image/png')
+        
+        # If no image found, generate a placeholder
+        img = Image.new('RGB', (224, 224), color=(240, 240, 245))
+        draw = ImageDraw.Draw(img)
+        
+        # Draw text on placeholder
+        text_lines = [
+            "MRI Scan",
+            f"Type: {label.replace('_', ' ').title()}",
+            "Image not available",
+            "locally"
+        ]
+        
+        # Draw centered text
+        y_pos = 60
+        for line in text_lines:
+            # Simple text rendering (PIL default font)
+            bbox = draw.textbbox((0, 0), line)
+            text_width = bbox[2] - bbox[0]
+            x_pos = (224 - text_width) // 2
+            draw.text((x_pos, y_pos), line, fill=(100, 100, 120))
+            y_pos += 30
+        
+        # Draw border
+        draw.rectangle([(10, 10), (214, 214)], outline=(200, 200, 210), width=2)
+        
+        # Return the image
+        img_io = BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        return send_file(img_io, mimetype='image/png')
+        
+    except Exception as e:
+        # Return a simple error placeholder
+        img = Image.new('RGB', (224, 224), color=(255, 240, 240))
+        draw = ImageDraw.Draw(img)
+        draw.text((60, 100), "Error loading", fill=(200, 50, 50))
+        draw.text((80, 120), "image", fill=(200, 50, 50))
+        img_io = BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        return send_file(img_io, mimetype='image/png')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -131,7 +211,7 @@ def patient_records():
     try:
         db = get_db()
         cursor = db.execute("""
-            SELECT * FROM mri_scans 
+            SELECT rowid, * FROM mri_scans 
             WHERE patient_id = ? 
             ORDER BY scan_date DESC
         """, (patient_id,))
@@ -141,7 +221,10 @@ def patient_records():
         
         results = []
         for row in rows:
-            results.append(dict(zip(columns, row)))
+            record = dict(zip(columns, row))
+            # Add image URL
+            record['image_url'] = f"/image/{record['rowid']}"
+            results.append(record)
         
         return jsonify({
             'success': True,

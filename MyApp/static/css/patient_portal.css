@@ -135,6 +135,31 @@ body {
   transform: translateY(-2px);
 }
 
+.record-image {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  min-height: 200px;
+}
+
+.mri-thumbnail {
+  max-width: 100%;
+  height: auto;
+  max-height: 224px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.mri-thumbnail:hover {
+  transform: scale(1.05);
+}
+
 .record-header {
   display: flex;
   justify-content: space-between;

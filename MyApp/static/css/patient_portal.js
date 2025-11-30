@@ -32,6 +32,9 @@ function displayRecords(records) {
     const displayLabel = record.label ? record.label.replace(/_/g, ' ') : 'Unknown';
     
     card.innerHTML = `
+      <div class="record-image">
+        <img src="${record.image_url}" alt="${escapeHtml(displayLabel)}" class="mri-thumbnail" />
+      </div>
       <div class="record-header">
         <span class="record-label ${labelClass}">${escapeHtml(displayLabel)}</span>
         <span class="scan-date">${escapeHtml(record.scan_date || 'N/A')}</span>
