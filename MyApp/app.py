@@ -84,7 +84,7 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.config["DATABASE"] = os.path.join(os.path.dirname(__file__), "brain_etl.db")
-app.secret_key = 'your-secret-key-change-this-in-production'  # Change this to a random secret key
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')  # Use env var in production
 
 # NOTE: we will use a `users` table in the database for authentication.
 # The script `create_users_table.py` can be used to populate patient users.
