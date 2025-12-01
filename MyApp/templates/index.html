@@ -155,8 +155,8 @@
                 <ul class="etl-list">
                   <li>Two portals: patient (access to patient specific scan), admin and radiologist (access to entire database)</li>
                   <li>Patient portal takes Username and Password as patient_ID / patient_ID (Try: 8270, 8270 or 1860, 1860)
-                  <li>Load: Metadata with additional synthetic fields (age, gender, scan date, hospital unit), stored in SQLite database</li>
-                  <li>Created relational links between patients, scans, and classifications with proper foreign key constraints</li>
+                  <li>Database can be accessed with Admin or Radiologist credentials. Only one Admin and five Radiologists exist. (Try: admin, password123; rad1, password123; rad2, password123; rad3, password123; rad4, password123, rad5, password123)</li>
+                  <li>Admin and Radiologist logins will be able to create new patient records, query, and find/delete specific patients using patient ID</li>
                 </ul>
               </div>
             </details>
@@ -176,86 +176,6 @@
                 </p>
               </div>
             </details>
-          </div>
-        </section>
-        <section class="frame">
-          <div class="frame-2">
-            <article class="upload-file">
-              <header class="header"><h2 class="title-2">Download a random MRI scan and try our model</h2></header>
-              <div class="content">
-                <form
-                  id="upload-form"
-                  class="component-upload"
-                  method="post"
-                  enctype="multipart/form-data"
-                  aria-label="MRI Image Upload Form"
-                >
-                  <div class="frame-3">
-                    <img
-                      id="preview-image"
-                      class="component-2"
-                      src="https://c.animaapp.com/DnqGvymX/img/component-placeholder-image-2@2x.png"
-                      alt="MRI image placeholder"
-                    />
-                    <div class="frame-4">
-                      <label for="mri-upload" class="please-upload-square">Upload a MRI Brain Image</label>
-                      <div class="component-upload-2">
-                        <div class="component-button">
-                          <label for="mri-upload" class="frame-5">
-                            <span class="text-wrapper-5">Choose File</span>
-                          </label>
-                          <input
-                            type="file"
-                            id="mri-upload"
-                            name="mri-upload"
-                            accept="image/*"
-                            aria-describedby="file-chosen"
-                            hidden
-                          />
-                        </div>
-                        <div class="component-chosen">
-                          <span class="text-wrapper-6" id="file-chosen" aria-live="polite">No File Chosen</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="component-button-wrapper">
-                    <button type="button" id="save-btn" class="frame-wrapper" aria-label="Save uploaded image" disabled>
-                      <span class="frame-5"><span class="choose-file">Save</span></span>
-                    </button>
-                  </div>
-                </form>
-                <!-- <hr class="divider-line" aria-hidden="true" /> -->
-                <div class="sample-file-cta">
-                  <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Download Random MRI Image">
-                    <div class="download">
-                      <img class="icon" src="https://c.animaapp.com/DnqGvymX/img/icon-1.png" alt="Download icon" />
-                    </div>
-                  </a>
-                  <span class="text-wrapper-7">Download Random MRI Image</span>
-                </div>
-              </div>
-              <footer class="button">
-                <button type="button" id="cancel-btn" class="secondary-button" aria-label="Cancel operation">
-                  <span class="label">Cancel</span>
-                </button>
-                <button type="button" id="submit-btn" class="primary-button" aria-label="Submit MRI image for classification" disabled>
-                  <span class="label-2">Submit</span>
-                </button>
-              </footer>
-            </article>
-            <aside class="product-info-card" aria-label="Classification Results">
-              <div id="result-image" class="image-2" role="img" aria-label="Result visualization"></div>
-              <div class="body-2">
-                <div class="div-wrapper"><h3 class="text-wrapper-8">Results</h3></div>
-                <div class="text-strong"><span class="text-wrapper-9">Tumor?</span></div>
-                <div class="div-wrapper"><output id="tumor-result" class="text-wrapper-10" aria-live="polite">-</output></div>
-                <div class="text-strong-2"><span class="text-wrapper-11">Type?</span></div>
-                <div class="text-small">
-                  <output id="type-result" class="text-wrapper-12" aria-live="polite">-</output>
-                </div>
-              </div>
-            </aside>
           </div>
         </section>
         <footer class="footer-wrapper">
