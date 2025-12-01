@@ -30,7 +30,7 @@
             <div class="text">
               <p class="p">
                 <ul class="etl-list">
-                  <li>One Patient → can have many MRI scans</li>
+                  <li>One Patient → One MRI Scan</li>
                   <li>One MRI scan → one Classification result</li>
                   <li> Admins, Radiologists, Patients are subclasses of Users</li>
                 </ul>
@@ -41,9 +41,7 @@
               <p class="p">
                 <ul class="etl-list">
                   <li>Tables: Users (consolidated subclasses), mri_scans, tumor_classification</li>
-                  <li>mri_scans + extra attributes for metadata</li>
-                  <li>Relationship changed for simplicity: One Patient → one MRI scan</li>
-                </ul>
+                  <li>move Patient attributes to MRI_scans and use patientID as foreign key</li>                </ul>
               </p>
             </div>
             <details class="accordion-item">
@@ -150,187 +148,11 @@
             </details>
             <details class="accordion-item">
               <summary class="accordion-title">
-                <span class="text-wrapper-2">Queries (click result images to enlarge) </span>
-                <img
-                  class="img"
-                  src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
+                <span class="text-wrapper-2">Queries (moved to Database UI)</span>
+                <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg" alt="" aria-hidden="true" />
               </summary>
               <div class="accordion-content">
-                <div class="query-results-grid">
-                  <!-- Query 1: Tumor Distribution -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 1: Total cases by tumor type</p>
-                      <pre class="query-code">SELECT label AS tumor_type,
-       COUNT(*) AS total_cases
-FROM mri_scans
-GROUP BY label
-ORDER BY total_cases DESC;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query1_result.png') }}" alt="Query 1 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 2: Age Demographics -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 2: Age group analysis with average image area</p>
-                      <pre class="query-code">SELECT
-    CASE
-        WHEN age BETWEEN 20 AND 29 THEN '20s'
-        WHEN age BETWEEN 30 AND 39 THEN '30s'
-        WHEN age BETWEEN 40 AND 49 THEN '40s'
-        WHEN age BETWEEN 50 AND 59 THEN '50s'
-        WHEN age BETWEEN 60 AND 69 THEN '60s'
-        ELSE '70s+'
-    END AS age_group,
-    label,
-    AVG(orig_width * orig_height) AS avg_area,
-    COUNT(*) AS cases
-FROM mri_scans
-GROUP BY age_group, label
-ORDER BY age_group;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query2_result.png') }}" alt="Query 2 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 3: Hospital Unit Distribution -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 3: Cases by hospital unit and tumor type</p>
-                      <pre class="query-code">SELECT hospital_unit,
-       label AS tumor_type,
-       COUNT(*) AS cases
-FROM mri_scans
-GROUP BY hospital_unit, label
-ORDER BY hospital_unit, cases DESC;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query3_result.png') }}" alt="Query 3 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 4: Gender Distribution -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 4: Total cases by gender and tumor type</p>
-                      <pre class="query-code">SELECT gender, label AS tumor_type, COUNT(*) AS total
-FROM mri_scans
-GROUP BY gender, tumor_type
-ORDER BY gender;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query4_result.png') }}" alt="Query 4 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 5: Glioma Cases -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 5: Glioma tumor cases for patients over 50</p>
-                      <pre class="query-code">SELECT processed_path, age, gender, hospital_unit
-FROM mri_scans
-WHERE label = 'glioma_tumor'
-  AND age > 50
-LIMIT 100;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query5_result.png') }}" alt="Query 5 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 6: Weekly Trends -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 6: Weekly case trends by tumor type</p>
-                      <pre class="query-code">SELECT
-    STRFTIME('%Y-%W', scan_date) AS week,
-    label AS tumor_type,
-    COUNT(*) AS cases
-FROM mri_scans
-GROUP BY week, tumor_type
-ORDER BY week;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query6_result.png') }}" alt="Query 6 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 7: Specific Tumor Cases -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 7: MRI scans for specific tumor types with patient info</p>
-                      <pre class="query-code">SELECT
-    ms.scan_id,
-    p.anonymized_id,
-    p.age,
-    p.gender,
-    ms.image_path,
-    tc.tumor_type,
-    tc.confidence_score,
-    p.hospital_name
-FROM MRI_Scans ms
-JOIN Patients p ON ms.patient_id = p.patient_id
-JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
-WHERE tc.tumor_type = 'glioma'
-ORDER BY tc.confidence_score DESC
-LIMIT 10;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query7_result.png') }}" alt="Query 7 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 8: Hospital Performance -->
-                  <div class="query-pair">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 8: Hospital performance statistics</p>
-                      <pre class="query-code">SELECT
-    p.hospital_name,
-    COUNT(DISTINCT p.patient_id) as total_patients,
-    COUNT(ms.scan_id) as total_scans,
-    SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
-        THEN 1 ELSE 0 END) as tumor_detections,
-    ROUND(SUM(CASE WHEN tc.tumor_type != 'no_tumor' 
-        THEN 1 ELSE 0 END) * 100.0 /
-        COUNT(ms.scan_id), 2) as detection_rate
-FROM Patients p
-JOIN MRI_Scans ms ON p.patient_id = ms.patient_id
-JOIN Tumor_Classification tc ON ms.scan_id = tc.scan_id
-GROUP BY p.hospital_name
-ORDER BY total_scans DESC;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query8_result.png') }}" alt="Query 8 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                  <!-- Query 9: Recent Scans -->
-                  <div class="query-pair query-pair-single">
-                    <div class="query-code-container">
-                      <p class="query-label">Query 9: Most recent scans by tumor type</p>
-                      <pre class="query-code">SELECT
-    tc.tumor_type,
-    COUNT(*) as recent_count,
-    MAX(ms.upload_timestamp) as latest_scan
-FROM Tumor_Classification tc
-JOIN MRI_Scans ms ON tc.scan_id = ms.scan_id
-WHERE ms.upload_timestamp >= date('now', '-30 days')
-GROUP BY tc.tumor_type
-ORDER BY recent_count DESC;</pre>
-                    </div>
-                    <div class="query-image-container">
-                      <img src="{{ url_for('static', filename='images/query9_result.png') }}" alt="Query 9 Result" class="query-image">
-                      <p class="query-label">Query Result</p>
-                    </div>
-                  </div>
-                </div>
+                <p class="body">Sample queries were moved to the <a href="/database">Database Query Interface</a> for execution. Open the Database page to run them as buttons or paste custom SELECT statements.</p>
               </div>
             </details>
             <details class="accordion-item">

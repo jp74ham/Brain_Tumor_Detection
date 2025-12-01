@@ -32,10 +32,13 @@ SELECT * FROM mri_scans LIMIT 10;"></textarea>
 
           <div class="sample-queries">
             <h3>Sample Queries:</h3>
-            <button class="sample-query-btn" data-query="SELECT * FROM mri_scans LIMIT 10;">All MRI Scans (10)</button>
-            <button class="sample-query-btn" data-query="SELECT label, COUNT(*) as count FROM mri_scans GROUP BY label;">Count by Label</button>
-            <button class="sample-query-btn" data-query="SELECT * FROM mri_scans WHERE label = 'glioma_tumor' LIMIT 5;">Glioma Cases</button>
-            <button class="sample-query-btn" data-query="SELECT gender, label, COUNT(*) as total FROM mri_scans GROUP BY gender, label;">Gender Distribution</button>
+            <button class="sample-query-btn" data-query="SELECT label AS tumor_type, COUNT(*) AS total_cases FROM mri_scans GROUP BY label ORDER BY total_cases DESC;">Total cases by tumor type</button>
+            <button class="sample-query-btn" data-query="SELECT CASE WHEN age BETWEEN 20 AND 29 THEN '20s' WHEN age BETWEEN 30 AND 39 THEN '30s' WHEN age BETWEEN 40 AND 49 THEN '40s' WHEN age BETWEEN 50 AND 59 THEN '50s' WHEN age BETWEEN 60 AND 69 THEN '60s' ELSE '70s+' END AS age_group, label, AVG(orig_width * orig_height) AS avg_area, COUNT(*) AS cases FROM mri_scans GROUP BY age_group, label ORDER BY age_group;">Age groups and average image area</button>
+            <button class="sample-query-btn" data-query="SELECT hospital_unit, label AS tumor_type, COUNT(*) AS cases FROM mri_scans GROUP BY hospital_unit, label ORDER BY hospital_unit, cases DESC;">Cases by hospital unit</button>
+            <button class="sample-query-btn" data-query="SELECT gender, label AS tumor_type, COUNT(*) AS total FROM mri_scans GROUP BY gender, tumor_type ORDER BY gender;">Gender distribution by tumor type</button>
+            <button class="sample-query-btn" data-query="SELECT processed_path, age, gender, hospital_unit FROM mri_scans WHERE label = 'glioma_tumor' AND age > 50 LIMIT 100;">Glioma cases (age &gt; 50)</button>
+            <button class="sample-query-btn" data-query="SELECT STRFTIME('%Y-%W', scan_date) AS week, label AS tumor_type, COUNT(*) AS cases FROM mri_scans GROUP BY week, tumor_type ORDER BY week;">Weekly case trends</button>
+            <!-- Last three buttons removed per user request -->
           </div>
         </div>
 
