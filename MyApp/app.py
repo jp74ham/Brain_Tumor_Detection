@@ -10,7 +10,49 @@ import binascii
 import secrets
 import shutil
 from datetime import datetime
+import sys
+import numpy as np
+import cv2
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.xception import preprocess_input
 
+MODEL_PATH = 'models/optimized_best.h5'
+TUMOR_CLASSES = ['glioma_tumor', 'meningioma_tumor', 'no_tumor', 'pituitary_tumor']
+
+try:
+    tumor_model = load_model(MODEL_PATH)
+    print(f" Loaded tumor detection model from {MODEL_PATH}")
+except Exception as e:
+    print(f" Could not load model: {e}")
+    tumor_model = None
+
+def predict_tumor(image_path):
+    """Run actual model prediction on MRI image"""
+    if tumor_model is None:
+        print("⚠️ Model not loaded, returning default")
+        return 'no_tumor', 0.0
+    
+    try:
+        # Preprocess image
+        img = cv2.imread(image_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (299, 299))
+        img = preprocess_input(img)
+        img_batch = np.expand_dims(img, axis=0)
+        
+        # Run prediction
+        predictions = tumor_model.predict(img_batch, verbose=0)
+        class_idx = np.argmax(predictions[0])
+        confidence = float(predictions[0][class_idx])
+        predicted_class = TUMOR_CLASSES[class_idx]
+        
+        print(f" Predicted: {predicted_class} with {confidence:.2%} confidence")
+        return predicted_class, confidence
+        
+    except Exception as e:
+        print(f" Prediction error: {e}")
+        return 'no_tumor', 0.0
+    
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -21,7 +63,7 @@ app.secret_key = 'your-secret-key-change-this-in-production'  # Change this to a
 # NOTE: we will use a `users` table in the database for authentication.
 # The script `create_users_table.py` can be used to populate patient users.
 DEFAULT_ADMIN_PASSWORD = 'password123'
-
+    
 def get_db():
     if "db" not in g:
         g.db = sqlite3.connect(app.config["DATABASE"])
@@ -30,7 +72,7 @@ def get_db():
     return g.db
 
 
-def _hash_password(password: str, salt: bytes | None = None, iterations: int = 100_000):
+def _hash_password(password: str, salt=None, iterations: int = 100_000):
     if salt is None:
         salt = secrets.token_bytes(16)
     dk = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, iterations)
@@ -243,10 +285,7 @@ def submit_patient_scan():
 
 @app.route('/predict_scan', methods=['POST'])
 def predict_scan():
-    """Run (or simulate) model prediction for a given scan_id. This is a placeholder
-    that inserts a row in `tumor_classification` and updates `mri_scans.label`.
-    Replace the internals with a call to your trained ML model later.
-    """
+    """Run ACTUAL model prediction for a given scan_id"""
     data = request.get_json() or {}
     scan_id = data.get('scan_id')
     if not scan_id:
@@ -261,26 +300,29 @@ def predict_scan():
 
         processed_path = row[0]
 
-        # Placeholder prediction - replace with actual model inference
-        predicted_label = 'no_tumor'
-        confidence = 0.0
-        model_name = 'placeholder-model'
+        predicted_label, confidence = predict_tumor(processed_path)
+        model_name = 'xception_optimized_86val_70test'
         classified_on = datetime.utcnow().isoformat()
 
         cur.execute('INSERT INTO tumor_classification (processed_path, predicted_label, confidence, model_name, classified_on) VALUES (?, ?, ?, ?, ?)',
                     (processed_path, predicted_label, confidence, model_name, classified_on))
 
-        # Optionally update mri_scans.label
-        try:
-            cur.execute('UPDATE mri_scans SET label = ? WHERE rowid = ?', (predicted_label, scan_id))
-        except Exception:
-            pass
+        # Update mri_scans.label with prediction
+        cur.execute('UPDATE mri_scans SET label = ? WHERE rowid = ?', (predicted_label, scan_id))
 
         db.commit()
 
         class_id = cur.lastrowid
-        return jsonify({'success': True, 'classification_id': class_id, 'predicted_label': predicted_label, 'confidence': confidence})
+        
+        return jsonify({
+            'success': True, 
+            'classification_id': class_id, 
+            'predicted_label': predicted_label, 
+            'confidence': confidence
+        })
+        
     except Exception as e:
+        print(f" Error in predict_scan: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/image/<int:scan_id>')
