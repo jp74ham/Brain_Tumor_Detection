@@ -49,6 +49,43 @@ SELECT * FROM mri_scans LIMIT 10;"></textarea>
           </div>
         </div>
       </main>
+
+      <section class="patient-section">
+        <h2>Add Patient and MRI Scan</h2>
+        <p class="info-text">Create a new patient record and upload an MRI scan. After saving, you can run the trained model to populate predicted attributes.</p>
+        <form id="patient-form" enctype="multipart/form-data">
+          <div class="form-row">
+            <label for="patient-name">Name (optional)</label>
+            <input type="text" id="patient-name" name="patient_name" />
+          </div>
+          <div class="form-row">
+            <label for="patient-age">Age</label>
+            <input type="number" id="patient-age" name="age" min="0" max="120" required />
+          </div>
+          <div class="form-row">
+            <label for="patient-gender">Gender</label>
+            <select id="patient-gender" name="gender">
+              <option value="unknown">Prefer not to say</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="patient-hospital">Hospital / Unit</label>
+            <input type="text" id="patient-hospital" name="hospital_unit" />
+          </div>
+          <div class="form-row">
+            <label for="mri-file">MRI Image</label>
+            <input type="file" id="mri-file" name="mri_file" accept="image/*" required />
+          </div>
+          <div class="form-row">
+            <button type="button" id="submit-patient-btn" class="primary-button">Save Patient + Upload Scan</button>
+          </div>
+        </form>
+
+        <div id="patient-response" aria-live="polite"></div>
+      </section>
     </div>
 
     <script src="{{ url_for('static', filename='css/database.js') }}"></script>

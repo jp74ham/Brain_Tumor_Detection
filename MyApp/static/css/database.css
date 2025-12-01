@@ -213,3 +213,9 @@ body {
   padding: 40px;
   color: var(--color-text-default-secondary, #666666);
 }
+
+/* Patient section spacing adjustments */
+.patient-section {
+  padding-left: 48px;
+  padding-bottom: 300px;
+}

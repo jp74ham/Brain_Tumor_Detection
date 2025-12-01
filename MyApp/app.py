@@ -159,6 +159,130 @@ def upload_file():
     
     return jsonify({'error': 'Invalid file type'}), 400
 
+
+@app.route('/submit_patient_scan', methods=['POST'])
+def submit_patient_scan():
+    """Accepts multipart form with patient attributes and an MRI image file.
+    Creates a patient user (username auto-generated), saves the image, inserts a mri_scans row,
+    and returns patient_id and scan_id. The actual ML prediction is a separate step.
+    """
+    try:
+        # Validate file
+        if 'mri_file' not in request.files:
+            return jsonify({'success': False, 'error': 'No MRI file provided'}), 400
+
+        file = request.files['mri_file']
+        if file.filename == '' or not allowed_file(file.filename):
+            return jsonify({'success': False, 'error': 'Invalid or missing file'}), 400
+
+        # Read form fields
+        patient_name = (request.form.get('patient_name') or '').strip()
+        age = request.form.get('age')
+        gender = request.form.get('gender') or None
+        hospital_unit = request.form.get('hospital_unit') or None
+
+        # Save file
+        filename = secure_filename(file.filename)
+        ts = datetime.utcnow().strftime('%Y%m%dT%H%M%S')
+        filename_on_disk = f"{ts}_{filename}"
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename_on_disk)
+        file.save(save_path)
+
+        # Compute simple image stats
+        try:
+            img = Image.open(save_path).convert('RGB')
+            orig_w, orig_h = img.size
+            # basic mean/std across channels
+            from PIL import ImageStat
+            stat = ImageStat.Stat(img)
+            mean_pixel = float(sum(stat.mean) / len(stat.mean))
+            std_pixel = float(sum(stat.stddev) / len(stat.stddev))
+        except Exception:
+            orig_w = None
+            orig_h = None
+            mean_pixel = None
+            std_pixel = None
+
+        # Create a new patient user record in `users` with auto-generated id
+        db = get_db()
+        cur = db.cursor()
+
+        patient_id = int(datetime.utcnow().timestamp() * 1000)
+        username = f"patient_{patient_id}"
+        pwd_hash, salt_hex, iters = _hash_password('changeme')
+        created_on = datetime.utcnow().isoformat()
+
+        try:
+            cur.execute('INSERT INTO users (username, password_hash, password_salt, iterations, role, patient_id, created_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        (username, pwd_hash, salt_hex, iters, 'patient', patient_id, created_on))
+        except sqlite3.IntegrityError:
+            # fallback: if username exists, append random suffix
+            username = f"patient_{patient_id}_{secrets.token_hex(4)}"
+            cur.execute('INSERT INTO users (username, password_hash, password_salt, iterations, role, patient_id, created_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        (username, pwd_hash, salt_hex, iters, 'patient', patient_id, created_on))
+
+        # Insert into mri_scans table
+        ingest_ts = datetime.utcnow().isoformat()
+        scan_date = ingest_ts
+        original_path = save_path
+        processed_path = save_path
+        label = None
+
+        cur.execute('''INSERT INTO mri_scans (original_path, processed_path, label, orig_width, orig_height, proc_width, proc_height, mean_pixel, std_pixel, ingest_timestamp, patient_id, age, gender, hospital_unit, scan_date)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (original_path, processed_path, label, orig_w, orig_h, orig_w, orig_h, mean_pixel, std_pixel, ingest_ts, patient_id, age, gender, hospital_unit, scan_date))
+
+        db.commit()
+
+        scan_id = cur.lastrowid
+
+        return jsonify({'success': True, 'patient_id': patient_id, 'username': username, 'scan_id': scan_id, 'filepath': f'/static/uploads/{filename_on_disk}'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/predict_scan', methods=['POST'])
+def predict_scan():
+    """Run (or simulate) model prediction for a given scan_id. This is a placeholder
+    that inserts a row in `tumor_classification` and updates `mri_scans.label`.
+    Replace the internals with a call to your trained ML model later.
+    """
+    data = request.get_json() or {}
+    scan_id = data.get('scan_id')
+    if not scan_id:
+        return jsonify({'success': False, 'error': 'scan_id required'}), 400
+
+    try:
+        db = get_db()
+        cur = db.cursor()
+        row = cur.execute('SELECT processed_path FROM mri_scans WHERE rowid = ?', (scan_id,)).fetchone()
+        if not row:
+            return jsonify({'success': False, 'error': 'scan not found'}), 404
+
+        processed_path = row[0]
+
+        # Placeholder prediction - replace with actual model inference
+        predicted_label = 'no_tumor'
+        confidence = 0.0
+        model_name = 'placeholder-model'
+        classified_on = datetime.utcnow().isoformat()
+
+        cur.execute('INSERT INTO tumor_classification (processed_path, predicted_label, confidence, model_name, classified_on) VALUES (?, ?, ?, ?, ?)',
+                    (processed_path, predicted_label, confidence, model_name, classified_on))
+
+        # Optionally update mri_scans.label
+        try:
+            cur.execute('UPDATE mri_scans SET label = ? WHERE rowid = ?', (predicted_label, scan_id))
+        except Exception:
+            pass
+
+        db.commit()
+
+        class_id = cur.lastrowid
+        return jsonify({'success': True, 'classification_id': class_id, 'predicted_label': predicted_label, 'confidence': confidence})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/image/<int:scan_id>')
 def get_image(scan_id):
     """Serve MRI scan image or generate placeholder if not available"""
