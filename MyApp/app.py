@@ -4,6 +4,12 @@ import sqlite3
 from werkzeug.utils import secure_filename
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
+import mimetypes
+import hashlib
+import binascii
+import secrets
+import shutil
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -12,9 +18,9 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.config["DATABASE"] = os.path.join(os.path.dirname(__file__), "brain_etl.db")
 app.secret_key = 'your-secret-key-change-this-in-production'  # Change this to a random secret key
 
-# Simple credentials (in production, use hashed passwords and a database)
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'password123'  # Change this!
+# NOTE: we will use a `users` table in the database for authentication.
+# The script `create_users_table.py` can be used to populate patient users.
+DEFAULT_ADMIN_PASSWORD = 'password123'
 
 def get_db():
     if "db" not in g:
@@ -22,6 +28,91 @@ def get_db():
         g.db.row_factory = sqlite3.Row
         print("Connected to the database")
     return g.db
+
+
+def _hash_password(password: str, salt: bytes | None = None, iterations: int = 100_000):
+    if salt is None:
+        salt = secrets.token_bytes(16)
+    dk = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, iterations)
+    return binascii.hexlify(dk).decode('ascii'), binascii.hexlify(salt).decode('ascii'), iterations
+
+
+def _verify_password(stored_hash_hex: str, stored_salt_hex: str, iterations: int, candidate_password: str) -> bool:
+    try:
+        salt = binascii.unhexlify(stored_salt_hex)
+        dk = hashlib.pbkdf2_hmac('sha256', candidate_password.encode('utf-8'), salt, iterations)
+        return binascii.hexlify(dk).decode('ascii') == stored_hash_hex
+    except Exception:
+        return False
+
+
+def _backup_db(db_path: str) -> str:
+    ts = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+    backup = f"{db_path}.bak.{ts}"
+    try:
+        shutil.copy2(db_path, backup)
+    except Exception:
+        return ''
+    return backup
+
+
+def ensure_users_table_and_defaults():
+    """Create `users` table if missing and ensure admin + radiologist accounts exist."""
+    db_path = app.config.get('DATABASE')
+    if not db_path or not os.path.exists(db_path):
+        return
+
+    # backup db
+    _backup_db(db_path)
+
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password_hash TEXT NOT NULL,
+            password_salt TEXT NOT NULL,
+            iterations INTEGER NOT NULL,
+            role TEXT NOT NULL,
+            patient_id INTEGER,
+            created_on TEXT NOT NULL
+        )
+    ''')
+
+    # ensure admin user exists
+    cur.execute('SELECT 1 FROM users WHERE username = ?', ('admin',))
+    if not cur.fetchone():
+        pwd_hash, salt_hex, iters = _hash_password(DEFAULT_ADMIN_PASSWORD)
+        cur.execute('INSERT INTO users (username, password_hash, password_salt, iterations, role, patient_id, created_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    ('admin', pwd_hash, salt_hex, iters, 'admin', None, datetime.utcnow().isoformat()))
+
+    # ensure radiologist users rad1..rad5 exist
+    for i in range(1, 6):
+        uname = f'rad{i}'
+        cur.execute('SELECT 1 FROM users WHERE username = ?', (uname,))
+        if not cur.fetchone():
+            pwd_hash, salt_hex, iters = _hash_password('password123')
+            cur.execute('INSERT INTO users (username, password_hash, password_salt, iterations, role, patient_id, created_on) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        (uname, pwd_hash, salt_hex, iters, 'radiologist', None, datetime.utcnow().isoformat()))
+
+    conn.commit()
+    conn.close()
+
+
+# Ensure users table exists before first request / before serving.
+# Flask 3.0+ may not provide `before_first_request`; prefer `before_serving`
+# when available. Fall back to calling the initializer immediately.
+if hasattr(app, 'before_first_request'):
+    @app.before_first_request
+    def _ensure_users_table_on_start():
+        ensure_users_table_and_defaults()
+elif hasattr(app, 'before_serving'):
+    @app.before_serving
+    def _ensure_users_table_on_start():
+        ensure_users_table_and_defaults()
+else:
+    # Final fallback: call at import time (safe and idempotent)
+    ensure_users_table_and_defaults()
 
 @app.teardown_appcontext
 def close_db(exception):
@@ -102,7 +193,38 @@ def get_image(scan_id):
         image_found = False
         for path in possible_paths:
             if path and os.path.exists(path):
-                return send_file(path, mimetype='image/png')
+                mtype = mimetypes.guess_type(path)[0] or 'application/octet-stream'
+                return send_file(path, mimetype=mtype)
+
+        # If images are organized under `static/training_images/<tumor>/<file>`
+        # search recursively for a file matching the basename of the stored path.
+        try:
+            # search both `static/training_images` and top-level `training_images`
+            candidates = [
+                os.path.join(os.path.dirname(__file__), 'static', 'training_images'),
+                os.path.join(os.path.dirname(__file__), 'training_images')
+            ]
+            base_dir = None
+            for c in candidates:
+                if os.path.isdir(c):
+                    base_dir = c
+                    break
+
+            target_names = set()
+            if original_path:
+                target_names.add(os.path.basename(original_path).lower())
+            if processed_path:
+                target_names.add(os.path.basename(processed_path).lower())
+
+            if base_dir and os.path.isdir(base_dir):
+                for dp, dn, files in os.walk(base_dir):
+                    for fname in files:
+                        if fname.lower() in target_names:
+                            found_path = os.path.join(dp, fname)
+                            mtype = mimetypes.guess_type(found_path)[0] or 'application/octet-stream'
+                            return send_file(found_path, mimetype=mtype)
+        except Exception:
+            pass
         
         # If no image found, generate a placeholder
         img = Image.new('RGB', (224, 224), color=(240, 240, 245))
@@ -148,40 +270,88 @@ def get_image(scan_id):
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    
-    if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
-        session['logged_in'] = True
-        session['username'] = username
-        session['user_type'] = 'admin'
-        return jsonify({'success': True, 'redirect': '/database'})
-    else:
+    data = request.get_json() or {}
+    username = (data.get('username') or '').strip()
+    password = data.get('password') or ''
+
+    if not username or not password:
+        return jsonify({'success': False, 'error': 'Username and password required'}), 400
+
+    try:
+        db = get_db()
+        cur = db.execute('SELECT password_hash, password_salt, iterations, role, patient_id FROM users WHERE username = ?', (username,))
+        row = cur.fetchone()
+        if not row:
+            return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
+
+        stored_hash, stored_salt, iterations, role, patient_id = row
+        if _verify_password(stored_hash, stored_salt, iterations, password):
+            session.clear()
+            session['logged_in'] = True
+            session['username'] = username
+            session['user_type'] = role
+            if role == 'patient':
+                session['patient_id'] = patient_id
+
+            # Redirect based on role
+            if role in ('admin', 'radiologist'):
+                return jsonify({'success': True, 'redirect': '/database'})
+            if role == 'patient':
+                return jsonify({'success': True, 'redirect': '/patient_portal'})
+            if role == 'patient':
+                return jsonify({'success': True, 'redirect': '/patient_portal'})
+
+            return jsonify({'success': True, 'redirect': '/'})
+
         return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
+    except Exception:
+        return jsonify({'success': False, 'error': 'Authentication error'}), 500
 
 @app.route('/patient_login', methods=['POST'])
 def patient_login():
-    data = request.get_json()
-    patient_id = data.get('patient_id', '').strip()
-    
+    data = request.get_json() or {}
+
+    # Accept either { username, password } (preferred) or legacy { patient_id }
+    username = data.get('username') or data.get('patient_id')
+    password = data.get('password')
+
+    if username and password:
+        try:
+            db = get_db()
+            cur = db.execute('SELECT password_hash, password_salt, iterations, role, patient_id FROM users WHERE username = ?', (str(username),))
+            row = cur.fetchone()
+            if not row:
+                return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
+            stored_hash, stored_salt, iterations, role, patient_id = row
+            if _verify_password(stored_hash, stored_salt, iterations, password):
+                session.clear()
+                session['logged_in'] = True
+                session['username'] = str(username)
+                session['user_type'] = role
+                if role == 'patient':
+                    session['patient_id'] = patient_id
+                return jsonify({'success': True, 'redirect': '/patient_portal'})
+            return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
+        except Exception:
+            return jsonify({'success': False, 'error': 'Database error'}), 500
+
+    # Legacy behavior: accept patient_id only (no password)
+    patient_id = str(data.get('patient_id', '')).strip()
     if not patient_id:
         return jsonify({'success': False, 'error': 'Patient ID is required'}), 400
-    
-    # Check if patient ID exists in database
     try:
         db = get_db()
         cursor = db.execute("SELECT DISTINCT patient_id FROM mri_scans WHERE patient_id = ?", (patient_id,))
         patient = cursor.fetchone()
-        
         if patient:
+            session.clear()
             session['logged_in'] = True
             session['patient_id'] = patient_id
             session['user_type'] = 'patient'
             return jsonify({'success': True, 'redirect': '/patient_portal'})
         else:
             return jsonify({'success': False, 'error': 'Patient ID not found'}), 401
-    except Exception as e:
+    except Exception:
         return jsonify({'success': False, 'error': 'Database error'}), 500
 
 @app.route('/logout')
@@ -191,7 +361,8 @@ def logout():
 
 @app.route('/database')
 def database():
-    if not session.get('logged_in') or session.get('user_type') != 'admin':
+    # Allow both admins and radiologists to access the DB console
+    if not session.get('logged_in') or session.get('user_type') not in ('admin', 'radiologist'):
         return redirect(url_for('index'))
     return render_template('database.html')
 

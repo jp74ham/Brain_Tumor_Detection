@@ -182,12 +182,16 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="login-modal-content">
       <div class="login-modal-header">
         <h2>Patient Login</h2>
-        <p>Enter your Patient ID to view your medical records</p>
+        <p>Enter your Patient Username and password to view your medical records</p>
       </div>
       <form class="login-form" id="patient-login-form">
         <div class="form-group">
-          <label for="patient-id">Patient ID</label>
-          <input type="text" id="patient-id" name="patient_id" required placeholder="Enter your patient ID">
+          <label for="patient-username">Patient Username</label>
+          <input type="text" id="patient-username" name="username" required placeholder="Enter your patient username" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="patient-password">Password</label>
+          <input type="password" id="patient-password" name="password" required placeholder="Enter your password" autocomplete="current-password">
         </div>
         <div class="login-error" id="patient-login-error"></div>
         <div class="login-actions">
@@ -212,7 +216,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const patientLoginCancelBtn = document.getElementById('patient-login-cancel');
   const patientLoginSubmitBtn = document.getElementById('patient-login-submit');
   const patientLoginError = document.getElementById('patient-login-error');
-  const patientIdInput = document.getElementById('patient-id');
+  const patientUsernameInput = document.getElementById('patient-username');
+  const patientPasswordInput = document.getElementById('patient-password');
 
   // Open admin login modal
   if (loginBtn) {
@@ -227,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (patientLoginBtn) {
     patientLoginBtn.addEventListener('click', function() {
       patientLoginModal.classList.add('active');
-      patientIdInput.focus();
+      if (patientUsernameInput) patientUsernameInput.focus();
       patientLoginError.classList.remove('active');
     });
   }
@@ -305,7 +310,8 @@ document.addEventListener('DOMContentLoaded', function() {
   patientLoginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const patientId = patientIdInput.value.trim();
+    const patientUsername = (patientUsernameInput && patientUsernameInput.value) ? patientUsernameInput.value.trim() : '';
+    const patientPassword = (patientPasswordInput && patientPasswordInput.value) ? patientPasswordInput.value : '';
     
     patientLoginSubmitBtn.disabled = true;
     patientLoginSubmitBtn.textContent = 'Accessing...';
@@ -317,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ patient_id: patientId })
+        body: JSON.stringify({ username: patientUsername, password: patientPassword })
       });
       
       const result = await response.json();

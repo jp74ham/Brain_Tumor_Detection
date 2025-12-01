@@ -22,7 +22,9 @@
         </header>
         <h2 class="text-wrapper-3">Schema and ER diagram</h2>
         <section class="panel-image-content">
-          <div class="image" role="img" aria-label="Brain MRI scan visualization"></div>
+          <div class="image" role="img" aria-label="ER Diagram">
+            <img src="{{ url_for('static', filename='images/ERD.drawio.png') }}" alt="ER Diagram" style="max-width:100%;height:auto;display:block;margin:0 auto;" />
+          </div>
           <div class="text-content-flow">
             <p class="text-wrapper-4">Consists of five key entities</p>
             <div class="text">
@@ -51,7 +53,7 @@
         </section>
         <section class="page-accordion">
           <div class="text-content-heading">
-            <h2 class="text-wrapper">Heading</h2>
+            <h2 class="text-wrapper">Project Information</h2>
           </div>
           <div class="accordion" role="region" aria-label="Project Information">
             <details class="accordion-item" open>
@@ -81,22 +83,6 @@
                 </p>
               </div>
             </details>
-            <details class="accordion-item">
-              <summary class="accordion-title">
-                <span class="text-wrapper-2">Timeline</span>
-                <img
-                  class="img"
-                  src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </summary>
-              <div class="accordion-content">
-                <p class="body">
-                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
-                </p>
-              </div>
-            </details>
             <details class="accordion-item" open>
               <summary class="accordion-title">
                 <span class="text-wrapper-2">ETL Pipeline</span>
@@ -104,11 +90,10 @@
               </summary>
               <div class="accordion-content">
                 <ul class="etl-list">
-                  <li>Extract: Downloaded brain MRI images from Kaggle dataset containing 4 tumor types (glioma, meningioma, pituitary, no_tumor)</li>
-                  <li>Transform: Preprocessed images - resized to 224x224, converted to RGB, normalized pixel values, and extracted metadata</li>
-                  <li>Load: Populated SQLite database with 5 tables - Patients (500 synthetic records using Faker), MRI_Scans, Tumor_Classification, Model_Performance, and User_Roles</li>
+                  <li>Extract: MRI images from the Kaggle dataset were unzipped and organized by tumor type.</li>
+                  <li>Transform: Preprocessed images - resized to 224x224, normalized pixel values, and extracted metadata, saved processed images</li>
+                  <li>Load: Metadata with additional synthetic fields (age, gender, scan date, hospital unit), stored in SQLite database</li>
                   <li>Created relational links between patients, scans, and classifications with proper foreign key constraints</li>
-                  <li>Generated ground truth labels from dataset folder structure for model training and validation</li>
                 </ul>
               </div>
             </details>

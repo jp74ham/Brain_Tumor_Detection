@@ -52,20 +52,21 @@ function displayRecords(records) {
           <span class="detail-label">Hospital Unit:</span>
           <span class="detail-value">${escapeHtml(record.hospital_unit || 'N/A')}</span>
         </div>
-        <div class="detail-row">
-          <span class="detail-label">Image Size:</span>
-          <span class="detail-value">${escapeHtml(String(record.orig_width || 'N/A'))} × ${escapeHtml(String(record.orig_height || 'N/A'))}</span>
-        </div>
+        
       </div>
-      <div class="record-stats">
-        Processed: ${escapeHtml(String(record.proc_width || 'N/A'))} × ${escapeHtml(String(record.proc_height || 'N/A'))} | 
-        Mean Pixel: ${record.mean_pixel ? Number(record.mean_pixel).toFixed(4) : 'N/A'} | 
-        Std: ${record.std_pixel ? Number(record.std_pixel).toFixed(4) : 'N/A'}
-      </div>
+      
     `;
     
     recordsContainer.appendChild(card);
   });
+
+    // Attach click handlers to thumbnails (delegation alternative)
+    const thumbnails = recordsContainer.querySelectorAll('.mri-thumbnail');
+    thumbnails.forEach(img => {
+      img.addEventListener('click', function(e) {
+        showImageModal(this.src, this.alt);
+      });
+    });
 }
 
 function displayError(errorMessage) {
@@ -85,4 +86,43 @@ function escapeHtml(text) {
     "'": '&#039;'
   };
   return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Image modal helpers
+function showImageModal(src, alt) {
+  // create modal if it doesn't exist
+  let modal = document.getElementById('image-modal-overlay');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'image-modal-overlay';
+    modal.innerHTML = `
+      <div class="image-modal-backdrop" id="image-modal-backdrop">
+        <button class="image-modal-close" id="image-modal-close" aria-label="Close image">×</button>
+        <img class="image-modal-img" id="image-modal-img" src="" alt="" />
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // events
+    modal.addEventListener('click', function(e) {
+      if (e.target.id === 'image-modal-overlay' || e.target.id === 'image-modal-backdrop') {
+        hideImageModal();
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') hideImageModal();
+    });
+    const closeBtn = modal.querySelector('#image-modal-close');
+    closeBtn.addEventListener('click', hideImageModal);
+  }
+
+  const modalImg = document.getElementById('image-modal-img');
+  modalImg.src = src;
+  modalImg.alt = alt || '';
+  modal.classList.add('active');
+}
+
+function hideImageModal() {
+  const modal = document.getElementById('image-modal-overlay');
+  if (modal) modal.classList.remove('active');
 }

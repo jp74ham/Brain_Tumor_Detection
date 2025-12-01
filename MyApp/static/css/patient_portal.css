@@ -225,3 +225,43 @@ body {
   font-size: 12px;
   color: var(--color-text-default-secondary, #666666);
 }
+
+/* Image modal styles */
+#image-modal-overlay {
+  display: none;
+}
+#image-modal-overlay.active {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+.image-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+.image-modal-img {
+  max-width: 95vw;
+  max-height: 90vh;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  background: #fff;
+}
+.image-modal-close {
+  position: absolute;
+  right: 28px;
+  top: 20px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 28px;
+  line-height: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  cursor: pointer;
+}
