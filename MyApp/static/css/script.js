@@ -112,7 +112,6 @@ if (cancelBtn) {
     submitBtn.disabled = true;
   });
 }
-}
 
 // Image modal functionality for query results
 document.addEventListener('DOMContentLoaded', function() {
