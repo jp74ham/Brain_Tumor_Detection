@@ -11,23 +11,49 @@ import secrets
 import shutil
 from datetime import datetime
 import sys
-import numpy as np
-import cv2
-from tensorflow.keras.models import load_model
-from tensorflow.keras.applications.xception import preprocess_input
+
+# Optional ML dependencies (graceful fallback if unavailable)
+try:
+    import numpy as np
+    import cv2
+    CV2_AVAILABLE = True
+    print("✓ OpenCV loaded successfully")
+except Exception as e:
+    print(f"⚠️  OpenCV not available: {e}")
+    print("   App will run without model prediction support.")
+    CV2_AVAILABLE = False
+    np = None
+    cv2 = None
+
+try:
+    from tensorflow.keras.models import load_model
+    from tensorflow.keras.applications.xception import preprocess_input
+    TF_AVAILABLE = True
+    print("✓ TensorFlow loaded successfully")
+except Exception as e:
+    print(f"⚠️  TensorFlow not available: {e}")
+    print("   Model prediction disabled.")
+    TF_AVAILABLE = False
+    load_model = None
+    preprocess_input = None
 
 MODEL_PATH = 'models/optimized_best.h5'
 TUMOR_CLASSES = ['glioma_tumor', 'meningioma_tumor', 'no_tumor', 'pituitary_tumor']
 
-try:
-    tumor_model = load_model(MODEL_PATH)
-    print(f" Loaded tumor detection model from {MODEL_PATH}")
-except Exception as e:
-    print(f" Could not load model: {e}")
-    tumor_model = None
+tumor_model = None
+if TF_AVAILABLE:
+    try:
+        tumor_model = load_model(MODEL_PATH)
+        print(f"✓ Loaded tumor detection model from {MODEL_PATH}")
+    except Exception as e:
+        print(f"⚠️  Could not load model: {e}")
 
 def predict_tumor(image_path):
     """Run actual model prediction on MRI image"""
+    if not CV2_AVAILABLE or not TF_AVAILABLE:
+        print("⚠️ ML dependencies unavailable, returning default")
+        return 'no_tumor', 0.0
+    
     if tumor_model is None:
         print("⚠️ Model not loaded, returning default")
         return 'no_tumor', 0.0
@@ -46,11 +72,11 @@ def predict_tumor(image_path):
         confidence = float(predictions[0][class_idx])
         predicted_class = TUMOR_CLASSES[class_idx]
         
-        print(f" Predicted: {predicted_class} with {confidence:.2%} confidence")
+        print(f"✓ Predicted: {predicted_class} with {confidence:.2%} confidence")
         return predicted_class, confidence
         
     except Exception as e:
-        print(f" Prediction error: {e}")
+        print(f"⚠️  Prediction error: {e}")
         return 'no_tumor', 0.0
     
 app = Flask(__name__)
@@ -218,7 +244,6 @@ def submit_patient_scan():
             return jsonify({'success': False, 'error': 'Invalid or missing file'}), 400
 
         # Read form fields
-        patient_name = (request.form.get('patient_name') or '').strip()
         age = request.form.get('age')
         gender = request.form.get('gender') or None
         hospital_unit = request.form.get('hospital_unit') or None
@@ -571,6 +596,94 @@ def patient_records():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+
+@app.route('/find_scans_by_patient', methods=['POST'])
+def find_scans_by_patient():
+    """Search MRI scans by patient_id (parameterized) and return results.
+    Accessible to logged-in admins and radiologists.
+    """
+    if not session.get('logged_in') or session.get('user_type') not in ('admin', 'radiologist'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    patient_id = str(data.get('patient_id', '')).strip()
+    if not patient_id:
+        return jsonify({'success': False, 'error': 'patient_id is required'}), 400
+
+    try:
+        db = get_db()
+        cursor = db.execute("SELECT rowid, * FROM mri_scans WHERE patient_id = ? ORDER BY scan_date DESC", (patient_id,))
+        columns = [description[0] for description in cursor.description]
+        rows = cursor.fetchall()
+
+        results = []
+        for row in rows:
+            record = dict(zip(columns, row))
+            record['image_url'] = f"/image/{record.get('rowid')}"
+            results.append(record)
+
+        return jsonify({
+            'success': True,
+            'columns': columns,
+            'data': results,
+            'count': len(results)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/delete_scans_by_patient', methods=['POST'])
+def delete_scans_by_patient():
+    """Delete all MRI scans (and related classification rows/files) for a given patient_id.
+    Restricted to admin users only.
+    """
+    if not session.get('logged_in') or session.get('user_type') != 'admin':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    patient_id = str(data.get('patient_id', '')).strip()
+    if not patient_id:
+        return jsonify({'success': False, 'error': 'patient_id is required'}), 400
+
+    try:
+        db = get_db()
+        cur = db.cursor()
+
+        # Find affected scans
+        cur.execute('SELECT rowid, original_path, processed_path FROM mri_scans WHERE patient_id = ?', (patient_id,))
+        rows = cur.fetchall()
+        if not rows:
+            return jsonify({'success': True, 'deleted_count': 0, 'deleted_scan_ids': []})
+
+        scan_ids = [r[0] for r in rows]
+        processed_paths = [r[2] for r in rows if r[2]]
+        original_paths = [r[1] for r in rows if r[1]]
+
+        # Delete related tumor_classification rows that reference these processed paths
+        if processed_paths:
+            placeholders = ','.join('?' for _ in processed_paths)
+            cur.execute(f"DELETE FROM tumor_classification WHERE processed_path IN ({placeholders})", tuple(processed_paths))
+
+        # Delete scans
+        cur.execute('DELETE FROM mri_scans WHERE patient_id = ?', (patient_id,))
+        deleted_count = cur.rowcount
+
+        db.commit()
+
+        # Attempt to remove files from disk (best-effort)
+        removed_files = []
+        for p in processed_paths + original_paths:
+            try:
+                if p and os.path.exists(p):
+                    os.remove(p)
+                    removed_files.append(p)
+            except Exception:
+                pass
+
+        return jsonify({'success': True, 'deleted_count': deleted_count, 'deleted_scan_ids': scan_ids, 'removed_files': removed_files})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/execute_query', methods=['POST'])
 def execute_query():

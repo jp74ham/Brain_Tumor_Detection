@@ -10,6 +10,89 @@ sampleQueryBtns.forEach(btn => {
   });
 });
 
+// Find scans by patient ID form handler (uses safe, parameterized server endpoint)
+const findPatientSubmit = document.getElementById('find-patient-submit');
+const findPatientInput = document.getElementById('find-patient-id');
+if (findPatientSubmit && findPatientInput) {
+  findPatientSubmit.addEventListener('click', async function() {
+    const pid = findPatientInput.value.trim();
+    if (!pid) {
+      alert('Please enter a Patient ID to search for.');
+      return;
+    }
+
+    findPatientSubmit.disabled = true;
+    findPatientSubmit.textContent = 'Searching...';
+    resultsContainer.innerHTML = '<p class="loading">Searching for scans...</p>';
+
+    try {
+      const resp = await fetch('/find_scans_by_patient', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ patient_id: pid })
+      });
+
+      const result = await resp.json();
+      if (resp.ok && result.success) {
+        displayResults(result);
+      } else {
+        displayError(result.error || 'No results returned');
+      }
+    } catch (err) {
+      displayError('Network error: ' + err.message);
+    } finally {
+      findPatientSubmit.disabled = false;
+      findPatientSubmit.textContent = 'Search';
+    }
+  });
+
+  // Allow Enter key in the input to trigger the search
+  findPatientInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      findPatientSubmit.click();
+    }
+  });
+}
+
+// Delete scans by patient ID (admin-only)
+const findPatientDelete = document.getElementById('find-patient-delete');
+if (findPatientDelete && findPatientInput) {
+  findPatientDelete.addEventListener('click', async function() {
+    const pid = findPatientInput.value.trim();
+    if (!pid) {
+      alert('Please enter a Patient ID to delete scans for.');
+      return;
+    }
+
+    if (!confirm(`Delete ALL MRI scans for patient ID ${pid}? This is irreversible.`)) return;
+
+    findPatientDelete.disabled = true;
+    findPatientDelete.textContent = 'Deleting...';
+    resultsContainer.innerHTML = '<p class="loading">Deleting scans...</p>';
+
+    try {
+      const resp = await fetch('/delete_scans_by_patient', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ patient_id: pid })
+      });
+
+      const result = await resp.json();
+      if (resp.ok && result.success) {
+        resultsContainer.innerHTML = `<div class="results-info">Deleted ${result.deleted_count} scan${result.deleted_count !== 1 ? 's' : ''} for patient ${pid}.</div>`;
+      } else {
+        displayError(result.error || 'Delete failed');
+      }
+    } catch (err) {
+      displayError('Network error: ' + err.message);
+    } finally {
+      findPatientDelete.disabled = false;
+      findPatientDelete.textContent = 'Delete Scans';
+    }
+  });
+}
+
 // Execute query
 executeBtn.addEventListener('click', async function() {
   const query = queryInput.value.trim();
@@ -110,7 +193,6 @@ queryInput.addEventListener('keydown', function(e) {
     executeBtn.click();
   }
 });
-
 // --- Patient form handling ---
 const patientForm = document.getElementById('patient-form');
 const submitPatientBtn = document.getElementById('submit-patient-btn');

@@ -152,7 +152,12 @@
                 <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg" alt="" aria-hidden="true" />
               </summary>
               <div class="accordion-content">
-                <p class="body">Sample queries were moved to the <a href="/database">Database Query Interface</a> for execution. Open the Database page to run them as buttons or paste custom SELECT statements.</p>
+                <ul class="etl-list">
+                  <li>Two portals: patient (access to patient specific scan), admin and radiologist (access to entire database)</li>
+                  <li>Patient portal takes Username and Password as patient_ID / patient_ID (Try: 8270, 8270 or 1860, 1860)
+                  <li>Load: Metadata with additional synthetic fields (age, gender, scan date, hospital unit), stored in SQLite database</li>
+                  <li>Created relational links between patients, scans, and classifications with proper foreign key constraints</li>
+                </ul>
               </div>
             </details>
             <details class="accordion-item">
