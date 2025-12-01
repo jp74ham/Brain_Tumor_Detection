@@ -100,7 +100,7 @@
             <h2 class="text-wrapper">Project Information</h2>
           </div>
           <div class="accordion" role="region" aria-label="Project Information">
-            <details class="accordion-item" open>
+            <details class="accordion-item">
               <summary class="accordion-title">
                 <span class="text-wrapper-2">Dataset and Links</span>
                 <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
@@ -115,7 +115,7 @@
                 </ul>
               </div>
             </details>
-            <details class="accordion-item" open>
+            <details class="accordion-item">
               <summary class="accordion-title">
                 <span class="text-wrapper-2">Tools and Technologies </span>
                 <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
@@ -132,7 +132,7 @@
                 </p>
               </div>
             </details>
-            <details class="accordion-item" open>
+            <details class="accordion-item">
               <summary class="accordion-title">
                 <span class="text-wrapper-2">ETL Pipeline</span>
                 <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
@@ -148,12 +148,12 @@
             </details>
             <details class="accordion-item">
               <summary class="accordion-title">
-                <span class="text-wrapper-2">Queries (moved to Database UI)</span>
+                <span class="text-wrapper-2">Queries</span>
                 <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg" alt="" aria-hidden="true" />
               </summary>
               <div class="accordion-content">
                 <ul class="etl-list">
-                  <li>Two portals: patient (access to patient specific scan), admin and radiologist (access to entire database)</li>
+                  <li>Access two portals on top right of website: patient (access to patient specific scan), admin and radiologist (access to entire database)</li>
                   <li>Patient portal takes Username and Password as patient_ID / patient_ID (Try: 8270, 8270 or 1860, 1860)
                   <li>Database can be accessed with Admin or Radiologist credentials. Only one Admin and five Radiologists exist. (Try: admin, password123; rad1, password123; rad2, password123; rad3, password123; rad4, password123, rad5, password123)</li>
                   <li>Admin and Radiologist logins will be able to create new patient records, query, and find/delete specific patients using patient ID</li>
@@ -171,9 +171,20 @@
                 />
               </summary>
               <div class="accordion-content">
-                <p class="body">
-                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
-                </p>
+                <p class="text-wrapper-4">Architecture & Training</p>
+                <ul class="etl-list">
+                  <li><strong>Model:</strong> Xception (transfer learning, 23M parameters)</li>
+                  <li><strong>Dataset:</strong> 3,000+ MRI images (Glioma, Meningioma, Pituitary, No Tumor)</li>
+                  <li><strong>Optimization:</strong> Fine-tuning + aggressive augmentation (rotation, zoom, flip)</li>
+                  <li><strong>Training:</strong> 25 epochs with early stopping, checkpoint management</li>
+                </ul>
+                <p class="text-wrapper-4">Results</p>
+                <ul class="etl-list">
+                  <li><strong>Test Accuracy:</strong> 70%</li>
+                  <li><strong>Inference Speed:</strong> ~2 sec/image</li>
+                  <li><strong>High Confidence:</strong> 80%+ on majority of predictions</li>
+                </ul>
+                <img src="{{ url_for('static', filename='images/graphs_charts.jpg') }}" alt="Training and Testing Results" style="max-width:100%;height:auto;display:block;margin:20px auto;" />
               </div>
             </details>
           </div>
