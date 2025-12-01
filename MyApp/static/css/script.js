@@ -11,7 +11,8 @@ const resultImage = document.getElementById('result-image');
 const tumorResult = document.getElementById('tumor-result');
 const typeResult = document.getElementById('type-result');
 
-fileInput.addEventListener('change', function(e) {
+if (fileInput) {
+  fileInput.addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (file) {
     selectedFile = file;
@@ -26,8 +27,10 @@ fileInput.addEventListener('change', function(e) {
     saveBtn.disabled = false;
   }
 });
+}
 
-saveBtn.addEventListener('click', async function() {
+if (saveBtn) {
+  saveBtn.addEventListener('click', async function() {
   if (!selectedFile) {
     alert('Please select a file first');
     return;
@@ -63,8 +66,10 @@ saveBtn.addEventListener('click', async function() {
     saveBtn.querySelector('.choose-file').textContent = 'Save';
   }
 });
+}
 
-submitBtn.addEventListener('click', async function() {
+if (submitBtn) {
+  submitBtn.addEventListener('click', async function() {
   if (!uploadedFilePath) {
     alert('Please save the file first');
     return;
@@ -91,19 +96,23 @@ submitBtn.addEventListener('click', async function() {
     submitBtn.querySelector('.label-2').textContent = 'Submit';
   }
 });
+}
 
-cancelBtn.addEventListener('click', function() {
-  selectedFile = null;
-  uploadedFilePath = null;
-  fileInput.value = '';
-  fileChosen.textContent = 'No File Chosen';
-  previewImage.src = 'https://c.animaapp.com/DnqGvymX/img/component-placeholder-image-2@2x.png';
-  resultImage.style.backgroundImage = 'url(https://c.animaapp.com/DnqGvymX/img/image-4.svg)';
-  tumorResult.textContent = '-';
-  typeResult.textContent = '-';
-  saveBtn.disabled = true;
-  submitBtn.disabled = true;
-});
+if (cancelBtn) {
+  cancelBtn.addEventListener('click', function() {
+    selectedFile = null;
+    uploadedFilePath = null;
+    fileInput.value = '';
+    fileChosen.textContent = 'No File Chosen';
+    previewImage.src = 'https://c.animaapp.com/DnqGvymX/img/component-placeholder-image-2@2x.png';
+    resultImage.style.backgroundImage = 'url(https://c.animaapp.com/DnqGvymX/img/image-4.svg)';
+    tumorResult.textContent = '-';
+    typeResult.textContent = '-';
+    saveBtn.disabled = true;
+    submitBtn.disabled = true;
+  });
+}
+}
 
 // Image modal functionality for query results
 document.addEventListener('DOMContentLoaded', function() {
