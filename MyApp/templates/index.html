@@ -26,29 +26,75 @@
             <img src="{{ url_for('static', filename='images/ERD.drawio.png') }}" alt="ER Diagram" style="max-width:100%;height:auto;display:block;margin:0 auto;" />
           </div>
           <div class="text-content-flow">
-            <p class="text-wrapper-4">Consists of five key entities</p>
+            <p class="text-wrapper-4">Key Relationships</p>
             <div class="text">
               <p class="p">
                 <ul class="etl-list">
-                  <li> Patients table stores anonymized patient data including demographics and scan details</li>
-                  <li>MRI_Scans table holds metadata for each MRI image linked to patients</li>
-                  <li>Tumor_Classification table contains model predictions with tumor types and confidence scores</li>
-                  <li>Model_Performance table tracks accuracy metrics over time</li>
-                  <li>User_Roles table manages access levels for different users.</li>
+                  <li>One Patient → can have many MRI scans</li>
+                  <li>One MRI scan → one Classification result</li>
+                  <li> Admins, Radiologists, Patients are subclasses of Users</li>
                 </ul>
               </p>
             </div>
-            <p class="text-wrapper-4">Relationships</p>
+            <p class="text-wrapper-4">Design → Execution</p>
             <div class="text">
               <p class="p">
                 <ul class="etl-list">
-                  <li>One Patient can have multiple MRI_Scans (1-to-Many)</li>
-                  <li>Each MRI_Scan has one Tumor_Classification (1-to-1)</li>
-                  <li>Multiple Tumor_Classification can reference a single Model_Performance record (Many-to-1)</li>
-                  <li>A User_Role can be associated with multiple MRI uploads (1-to-Many)</li>
+                  <li>Tables: Users (consolidated subclasses), mri_scans, tumor_classification</li>
+                  <li>mari_scans + extra attributes for metadata</li>
+                  <li>Relationship changed for simplicity: One Patient → one MRI scan</li>
                 </ul>
               </p>
             </div>
+            <details class="accordion-item">
+              <summary class="accordion-title">
+                <span class="text-wrapper-2">Final Database Schema</span>
+                <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg" alt="" aria-hidden="true" />
+              </summary>
+              <div class="accordion-content">
+                <div class="schema-block">
+                  <h4 class="text-wrapper-2">mri_scans</h4>
+                  <pre class="query-code">CREATE TABLE "mri_scans" (
+"original_path" TEXT,
+  "processed_path" TEXT,
+  "label" TEXT,
+  "orig_width" INTEGER,
+  "orig_height" INTEGER,
+  "proc_width" INTEGER,
+  "proc_height" INTEGER,
+  "mean_pixel" REAL,
+  "std_pixel" REAL,
+  "ingest_timestamp" TEXT,
+  "patient_id" INTEGER,
+  "age" INTEGER,
+  "gender" TEXT,
+  "hospital_unit" TEXT,
+  "scan_date" TEXT
+)</pre>
+
+                  <h4 class="text-wrapper-2">tumor_classification</h4>
+                  <pre class="query-code">CREATE TABLE tumor_classification (
+    classification_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    processed_path TEXT,
+    predicted_label TEXT,
+    confidence FLOAT,
+    model_name TEXT,
+    classified_on TEXT
+)</pre>
+
+                  <h4 class="text-wrapper-2">users</h4>
+                  <pre class="query-code">CREATE TABLE users (
+        username TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL,
+        password_salt TEXT NOT NULL,
+        iterations INTEGER NOT NULL,
+        role TEXT NOT NULL,
+        patient_id INTEGER,
+        created_on TEXT NOT NULL
+    )</pre>
+                </div>
+              </div>
+            </details>
           </div>
         </section>
         <section class="page-accordion">
@@ -58,28 +104,33 @@
           <div class="accordion" role="region" aria-label="Project Information">
             <details class="accordion-item" open>
               <summary class="accordion-title">
-                <span class="text-wrapper-2">Tools</span>
+                <span class="text-wrapper-2">Dataset and Links</span>
+                <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
+              </summary>
+              <div class="accordion-content">
+                <ul class="etl-list">
+                  <li>Sourced from <a href="https://www.kaggle.com/datasets/sartajbhuvaji/brain-tumor-classification-mri" target="_blank" rel="noopener noreferrer">Kaggle</a> (Bhuvaji et al.)</li>
+                  <li>4 tumor classes: glioma, meningioma, pituitary, no_tumor</li>
+                  <li>Contains ~3,000+ MRI images</li>
+                  <li>Organized in labeled directories</li>
+                  <li><a href="https://github.com/jp74ham/Brain_Tumor_Detection" target="_blank" rel="noopener noreferrer">Project Github</a></li>
+                </ul>
+              </div>
+            </details>
+            <details class="accordion-item" open>
+              <summary class="accordion-title">
+                <span class="text-wrapper-2">Tools and Technologies </span>
                 <img class="img" src="https://c.animaapp.com/DnqGvymX/img/chevron-up-4.svg" alt="" aria-hidden="true" />
               </summary>
               <div class="accordion-content">
                 <p class="body">
-                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
-                </p>
-              </div>
-            </details>
-            <details class="accordion-item">
-              <summary class="accordion-title">
-                <span class="text-wrapper-2">Methodology</span>
-                <img
-                  class="img"
-                  src="https://c.animaapp.com/DnqGvymX/img/chevron-down-13.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </summary>
-              <div class="accordion-content">
-                <p class="body">
-                  Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
+                  <ul class="etl-list">
+                  <li>Python, Pandas, NumPy, OpenCV — preprocessing</li>
+                  <li>TensorFlow / Keras — model training</li>
+                  <li>SQLite / SQLAlchemy — structured storage</li>
+                  <li>Flask — web framework</li>
+                  <li>Matplotlib — visualizations</li>
+                </ul>
                 </p>
               </div>
             </details>

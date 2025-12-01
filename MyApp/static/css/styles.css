@@ -61,6 +61,12 @@
 }
 
 .front .subtitle {
+
+/* Left-align accordion content so paragraphs and lists start at the same left edge */
+.accordion .accordion-content {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
   position: relative;
   display: flex;
   align-items: center;
@@ -218,6 +224,14 @@
   font-style: var(--body-base-font-style);
 }
 
+/* Accordion-specific body: keep normal paragraph flow and left alignment
+   so lists that follow are properly spaced and not centered. */
+.accordion .accordion-content .body {
+  display: block;
+  text-align: left;
+  margin: 0 0 0.5rem 0; /* space below paragraph before bullets */
+}
+
 .front .accordion-title-wrapper {
   display: flex;
   align-items: center;
@@ -327,6 +341,13 @@
   align-self: stretch;
   width: 100%;
   flex: 0 0 auto;
+}
+
+/* ETL list styling: remove extra indentation and align bullets with surrounding text */
+.front .etl-list {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1rem;
+  list-style-position: outside;
 }
 
 .front .p {
