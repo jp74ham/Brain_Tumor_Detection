@@ -323,7 +323,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   align-self: stretch;
   font-family: var(--subheading-font-family);
   font-weight: var(--subheading-font-weight);
@@ -332,6 +332,8 @@
   letter-spacing: var(--subheading-letter-spacing);
   line-height: var(--subheading-line-height);
   font-style: var(--subheading-font-style);
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .front .text {
