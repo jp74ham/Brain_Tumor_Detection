@@ -242,7 +242,7 @@ pip install opencv-python-headless==4.10.0.84
 
 ## 📄 License
 
-Educational project for **DS5110 - Data Management and Processing**  
+Educational project for **DS5110 - Essentials of Data Science**  
 Northeastern University, Fall 2025
 
 ## 📞 Project Resources
