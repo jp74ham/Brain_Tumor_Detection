@@ -28,6 +28,9 @@ except Exception as e:
 try:
     from tensorflow.keras.models import load_model
     from tensorflow.keras.applications.xception import preprocess_input
+    import tensorflow as tf
+    print("TensorFlow version:", tf.__version__)
+
     TF_AVAILABLE = True
     print("✓ TensorFlow loaded successfully")
 except Exception as e:
@@ -43,8 +46,12 @@ TUMOR_CLASSES = ['glioma_tumor', 'meningioma_tumor', 'no_tumor', 'pituitary_tumo
 tumor_model = None
 if TF_AVAILABLE:
     try:
-        tumor_model = load_model(MODEL_PATH)
+        # tumor_model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+        tumor_model = load_model(MODEL_PATH, compile=False)
         print(f"✓ Loaded tumor detection model from {MODEL_PATH}")
+        print("Input shape:", tumor_model.input_shape)
+        print("Output shape:", tumor_model.output_shape)
+
     except Exception as e:
         print(f"⚠️  Could not load model: {e}")
 
