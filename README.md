@@ -162,7 +162,7 @@ The application will start on `http://127.0.0.1:5000`
 - **Inference Speed**: ~2 seconds per image
 - **Confidence Threshold**: 80%+ for high-confidence predictions
 
-**Classification Results Example**:
+**Classification Results Example (used images in examples/)**: 
 ```
 Patient ID: 1764626454375
 Scan: test.jpg
