@@ -9,8 +9,7 @@ The goal of this project is to create an end-to-end data management and processi
 1. **Automates Brain Tumor Detection**: Uses deep learning to classify MRI scans into four categories (glioma, meningioma, pituitary tumor, or no tumor)
 2. **Manages Medical Data**: Provides a secure database system for storing patient information, MRI scans, and classification results
 3. **Enables Multi-Role Access**: Implements role-based authentication for administrators, radiologists, and patients
-4. **Tracks Data Operations**: Maintains an audit log of all patient additions and deletions for accountability
-5. **Provides Query Interface**: Offers a database management interface for executing SQL queries and viewing schema
+4. **Provides Query Interface**: Offers a database management interface for executing SQL queries and viewing schema
 
 This project demonstrates practical application of data management principles including ETL pipelines, database design, data security, and machine learning model integration.
 
@@ -86,7 +85,6 @@ The application will start on `http://127.0.0.1:5000`
    - Search for patient scans by ID
    - Delete patient records
    - Execute database queries
-   - View audit history
 
 2. **Patient Portal**:
    - View your MRI scans and classification results
@@ -106,7 +104,6 @@ The application will start on `http://127.0.0.1:5000`
 - **users**: Authentication and role management (PBKDF2-hashed passwords)
 - **mri_scans**: Patient information and MRI scan metadata
 - **tumor_classification**: Model predictions with confidence scores
-- **audit_log**: Complete history of data operations
 
 **Relationships**:
 - One-to-many: users → mri_scans (for patient users)
@@ -178,7 +175,6 @@ Model: xception_optimized_86val_70test
 - **Total Patients**: 15+ test patients
 - **Total Scans**: 20+ MRI scans processed
 - **Predictions Made**: 100% of uploaded scans classified
-- **Audit Entries**: Complete history of all operations
 
 ## 🌐 Live Deployment
 
