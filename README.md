@@ -247,6 +247,6 @@ Northeastern University, Fall 2025
 
 ## 📞 Project Resources
 
-- **Excel Planner**: [Project Timeline](https://northeastern-my.sharepoint.com/:x:/r/personal/pham_jes_northeastern_edu/Documents/DS5110-Project-Plan.xlsx?d=we6ad102e5fe348e18a4de70fdfc4fee1&csf=1&web=1&e=dVDJfh)
+- **Dataset**: https://www.kaggle.com/datasets/sartajbhuvaji/brain-tumor-classification-mri
 - **GitHub Repository**: https://github.com/jp74ham/Brain_Tumor_Detection
 - **Live Demo**: https://brain-tumor-detection-6equ.onrender.com
